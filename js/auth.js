@@ -1,9 +1,20 @@
 const Auth = (function () {
     function init() {
-        var form = document.getElementById('login-form');
-        if (!form) return;
+        // Guard: if already logged in, redirect to Dashboard
+        var session = Storage.get('session');
+        if (session && session.isLoggedIn) {
+            window.location.href = 'dashboard.html';
+            return;
+        }
 
-        form.addEventListener('submit', handleSignIn);
+        var instSetupCard = document.getElementById('inst-setup-card');
+        var signinCard = document.getElementById('signin-card');
+
+        if (instSetupCard) instSetupCard.classList.add('hidden');
+        if (signinCard) signinCard.classList.remove('hidden');
+
+        var loginForm = document.getElementById('login-form');
+        if (loginForm) loginForm.addEventListener('submit', handleSignIn);
 
         var rollInput = document.getElementById('roll-number');
         var passInput = document.getElementById('password');
@@ -11,22 +22,28 @@ const Auth = (function () {
         if (rollInput) rollInput.addEventListener('input', function () { clearFieldError('roll'); hideGlobalError(); });
         if (passInput) passInput.addEventListener('input', function () { clearFieldError('password'); hideGlobalError(); });
 
+        var clearDataBtn = document.getElementById('clear-data-btn');
+        if (clearDataBtn) clearDataBtn.addEventListener('click', handleClearData);
+
         populateFromConfig();
     }
 
     function populateFromConfig() {
         var config = Storage.get('config');
-        if (!config) return;
-
         var subtitle = document.getElementById('login-subtitle');
         if (subtitle) {
-            subtitle.textContent = config.schoolName + ' — Class ' + config.className;
+            if (config && config.schoolName) {
+                var cls = config.class || (config.className ? config.className.split(' ')[0] : '');
+                var sec = config.section || (config.className ? config.className.split(' ').slice(1).join(' ') : '');
+                subtitle.textContent = config.schoolName + ' — ' + cls + ' ' + sec;
+            } else {
+                subtitle.textContent = 'Welcome back to Anti-Kuddus Protocol';
+            }
         }
 
         var rollInput = document.getElementById('roll-number');
         if (rollInput) {
-            rollInput.max = config.studentCount;
-            rollInput.placeholder = 'Roll number (1-' + config.studentCount + ')';
+            rollInput.placeholder = 'Enter your roll number';
         }
     }
 
@@ -42,8 +59,8 @@ const Auth = (function () {
 
         var hasError = false;
 
-        if (isNaN(rollNumber) || rollNumber < 1) {
-            showFieldError('roll', 'Enter a valid roll number');
+        if (isNaN(rollNumber) || rollInput.value.trim() === "") {
+            showFieldError('roll', 'Roll Number is required');
             hasError = true;
         }
 
@@ -53,7 +70,7 @@ const Auth = (function () {
         }
 
         if (hasError) {
-            shakeCard();
+            shakeCard('#signin-card');
             return;
         }
 
@@ -62,13 +79,13 @@ const Auth = (function () {
 
         if (!user) {
             showGlobalError('No account found with Roll #' + rollNumber + '. Please sign up first.');
-            shakeCard();
+            shakeCard('#signin-card');
             return;
         }
 
         if (user.password !== password) {
             showGlobalError('Incorrect password. Please try again.');
-            shakeCard();
+            shakeCard('#signin-card');
             return;
         }
 
@@ -92,9 +109,27 @@ const Auth = (function () {
         }, 600);
     }
 
+    function handleClearData() {
+        UI.confirm('Are you sure you want to clear all platform data? This will permanently delete all users, complaints, rules, seat plans, and your active session.', function () {
+            Storage.clear();
+            localStorage.clear();
+            UI.toast('All platform data cleared!', 'success');
+            setTimeout(function () {
+                window.location.reload();
+            }, 800);
+        });
+    }
+
     function showFieldError(field, message) {
         var errorEl = document.getElementById(field + '-error');
-        var inputEl = document.getElementById(field === 'roll' ? 'roll-number' : field);
+        var inputIdMap = {
+            'roll': 'roll-number',
+            'password': 'password',
+            'setup-school': 'setup-school-name',
+            'setup-class': 'setup-class-name',
+            'setup-section': 'setup-section-name'
+        };
+        var inputEl = document.getElementById(inputIdMap[field]);
 
         if (errorEl) { errorEl.textContent = message; errorEl.classList.remove('hidden'); }
         if (inputEl) { inputEl.classList.add('form-input--error'); }
@@ -102,7 +137,14 @@ const Auth = (function () {
 
     function clearFieldError(field) {
         var errorEl = document.getElementById(field + '-error');
-        var inputEl = document.getElementById(field === 'roll' ? 'roll-number' : field);
+        var inputIdMap = {
+            'roll': 'roll-number',
+            'password': 'password',
+            'setup-school': 'setup-school-name',
+            'setup-class': 'setup-class-name',
+            'setup-section': 'setup-section-name'
+        };
+        var inputEl = document.getElementById(inputIdMap[field]);
 
         if (errorEl) { errorEl.textContent = ''; errorEl.classList.add('hidden'); }
         if (inputEl) { inputEl.classList.remove('form-input--error'); }
@@ -110,16 +152,16 @@ const Auth = (function () {
 
     function showGlobalError(message) {
         var el = document.getElementById('login-error');
-        if (el) { el.textContent = message; el.style.display = 'block'; }
+        if (el) { el.textContent = message; el.classList.remove('hidden'); el.style.display = 'block'; }
     }
 
     function hideGlobalError() {
         var el = document.getElementById('login-error');
-        if (el) { el.textContent = ''; el.style.display = 'none'; }
+        if (el) { el.textContent = ''; el.classList.add('hidden'); el.style.display = 'none'; }
     }
 
-    function shakeCard() {
-        var card = document.querySelector('.login-card');
+    function shakeCard(selector) {
+        var card = document.querySelector(selector || '.login-card');
         if (card) {
             card.classList.add('shake');
             card.addEventListener('animationend', function () { card.classList.remove('shake'); }, { once: true });

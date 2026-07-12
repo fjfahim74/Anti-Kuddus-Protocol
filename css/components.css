@@ -5,11 +5,11 @@
 /* --- Glass Card --- */
 .glass-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
     padding: var(--space-6);
     transition: all var(--transition-base);
 }
@@ -17,14 +17,14 @@
 .glass-card:hover {
     background: var(--glass-bg-hover);
     border-color: var(--glass-border-hover);
-    box-shadow: var(--shadow-xl);
+    box-shadow: var(--shadow-lg);
 }
 
 .glass-card--elevated {
     background: var(--glass-bg-elevated);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-color: var(--glass-border-hover);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl);
 }
@@ -36,7 +36,7 @@
 .glass-card--static:hover {
     background: var(--glass-bg);
     border-color: var(--glass-border);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
 }
 
 .glass-card--clickable {
@@ -44,11 +44,13 @@
 }
 
 .glass-card--clickable:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 102, 241, 0.05);
 }
 
 .glass-card--clickable:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
 }
 
 /* --- Buttons --- */
@@ -57,11 +59,11 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-2);
-    padding: var(--space-3) var(--space-6);
+    padding: 0.7rem var(--space-6);
     font-family: var(--font-primary);
     font-size: var(--text-sm);
     font-weight: var(--weight-semibold);
-    line-height: 1;
+    line-height: 1.2;
     border-radius: var(--radius-md);
     border: 1px solid transparent;
     cursor: pointer;
@@ -73,28 +75,31 @@
 }
 
 .btn:active {
-    transform: scale(0.97);
+    transform: scale(0.98);
 }
 
 .btn:disabled {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
     transform: none;
 }
 
 .btn--primary {
-    background: var(--gradient-primary);
+    background: var(--accent-primary);
     color: white;
     box-shadow: var(--shadow-glow-primary);
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .btn--primary:hover:not(:disabled) {
-    box-shadow: 0 0 30px rgba(108, 99, 255, 0.4);
-    filter: brightness(1.1);
+    background: var(--accent-primary-hover);
+    color: white;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+    transform: translateY(-1px);
 }
 
 .btn--secondary {
-    background: var(--glass-bg);
+    background: rgba(255, 255, 255, 0.03);
     color: var(--text-primary);
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(8px);
@@ -102,19 +107,24 @@
 }
 
 .btn--secondary:hover:not(:disabled) {
-    background: var(--glass-bg-hover);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
     border-color: var(--glass-border-hover);
+    transform: translateY(-1px);
 }
 
 .btn--danger {
-    background: var(--gradient-danger);
+    background: var(--accent-danger);
     color: white;
     box-shadow: var(--shadow-glow-danger);
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .btn--danger:hover:not(:disabled) {
-    box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
-    filter: brightness(1.1);
+    background: var(--accent-danger-hover);
+    color: white;
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
+    transform: translateY(-1px);
 }
 
 .btn--ghost {
@@ -130,28 +140,30 @@
 
 .btn--outline {
     background: transparent;
-    color: var(--accent-primary);
+    color: var(--accent-primary-hover);
     border: 1px solid var(--accent-primary);
 }
 
 .btn--outline:hover:not(:disabled) {
-    background: rgba(108, 99, 255, 0.1);
+    background: rgba(var(--accent-primary-rgb), 0.08);
+    color: var(--accent-primary-hover);
+    border-color: var(--accent-primary-hover);
 }
 
 .btn--sm {
-    padding: var(--space-2) var(--space-4);
+    padding: 0.45rem var(--space-4);
     font-size: var(--text-xs);
     border-radius: var(--radius-sm);
 }
 
 .btn--lg {
-    padding: var(--space-4) var(--space-8);
+    padding: 0.85rem var(--space-8);
     font-size: var(--text-base);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
 }
 
 .btn--xl {
-    padding: var(--space-5) var(--space-10);
+    padding: 1.1rem var(--space-10);
     font-size: var(--text-lg);
     border-radius: var(--radius-lg);
 }
@@ -189,9 +201,9 @@
 
 .form-input {
     width: 100%;
-    padding: var(--space-3) var(--space-4);
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    padding: 0.75rem var(--space-4);
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: var(--radius-md);
     color: var(--text-primary);
     font-size: var(--text-base);
@@ -201,13 +213,14 @@
 }
 
 .form-input:hover {
-    border-color: var(--glass-border-hover);
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.025);
 }
 
 .form-input:focus {
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px var(--accent-primary-glow);
-    background: var(--glass-bg-hover);
+    box-shadow: 0 0 0 3px var(--accent-primary-glow), inset 0 1px 1px rgba(0, 0, 0, 0.8);
+    background: rgba(255, 255, 255, 0.035);
 }
 
 .form-input::placeholder {
@@ -262,9 +275,9 @@ select.form-input option {
 }
 
 .badge--primary {
-    background: rgba(108, 99, 255, 0.15);
+    background: rgba(var(--accent-primary-rgb), 0.15);
     color: var(--accent-primary);
-    border: 1px solid rgba(108, 99, 255, 0.3);
+    border: 1px solid rgba(var(--accent-primary-rgb), 0.3);
 }
 
 .badge--success {
@@ -535,17 +548,80 @@ select.form-input option {
     font-weight: var(--weight-bold);
     color: var(--text-primary);
     text-decoration: none;
+    transition: var(--transition-normal);
+}
+
+.navbar__logo:hover {
+    opacity: 0.95;
 }
 
 .navbar__logo-icon {
-    width: 32px;
-    height: 32px;
-    background: var(--gradient-primary);
-    border-radius: var(--radius-sm);
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: var(--text-sm);
+    position: relative;
+}
+
+.logo-icon-svg {
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.3));
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logo-icon-shield {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logo-icon-lightning {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hover & Active states for logo animation */
+.navbar__logo:hover .logo-icon-svg,
+.landing-nav__logo:hover .logo-icon-svg {
+    transform: rotate(-8deg) scale(1.08);
+    filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.6)) drop-shadow(0 0 20px rgba(6, 182, 212, 0.3));
+}
+
+.navbar__logo:hover .logo-icon-shield,
+.landing-nav__logo:hover .logo-icon-shield {
+    fill: rgba(99, 102, 241, 0.18);
+    stroke-width: 2.5;
+}
+
+.navbar__logo:hover .logo-icon-lightning,
+.landing-nav__logo:hover .logo-icon-lightning {
+    filter: drop-shadow(0 0 6px rgba(6, 182, 212, 0.8));
+}
+
+/* Stylish typography */
+.logo-brand {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: var(--text-primary);
+    transition: var(--transition-normal);
+}
+
+.logo-brand--full {
+    font-size: 1.15rem;
+    letter-spacing: 0.1em;
+}
+
+.logo-brand-accent {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+    text-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
 }
 
 .navbar__actions {
@@ -726,7 +802,7 @@ select.form-input option {
 }
 
 .chip--active {
-    background: rgba(108, 99, 255, 0.15);
-    border-color: rgba(108, 99, 255, 0.3);
+    background: rgba(var(--accent-primary-rgb), 0.15);
+    border-color: rgba(var(--accent-primary-rgb), 0.3);
     color: var(--accent-primary);
 }

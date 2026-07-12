@@ -97,6 +97,7 @@ const Utils = (function () {
     function getRoleName(role) {
         const roles = {
             student: 'Student',
+            captain: 'Captain',
             captain_2nd: '2nd Captain',
             captain_3rd: '3rd Captain',
             cr: 'Class Representative',
@@ -106,7 +107,7 @@ const Utils = (function () {
     }
 
     function isCaptain(role) {
-        return role === 'captain_2nd' || role === 'captain_3rd';
+        return role === 'captain' || role === 'captain_2nd' || role === 'captain_3rd';
     }
 
     function isAuthority(role) {

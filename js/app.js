@@ -105,7 +105,7 @@ const App = (function () {
 
     function logout() {
         Storage.remove('session');
-        Utils.navigate('login.html');
+        Utils.navigate('index.html');
     }
 
     function resetSetup() {
@@ -167,13 +167,28 @@ const App = (function () {
     }
 
     function getNavbarHTML(options = {}) {
-        const { backLink = 'dashboard.html', title = 'AKP' } = options;
+        const { backLink = 'index.html', title = 'AKP' } = options;
         const base = Utils.getBasePath();
+        const displayTitle = title === 'AKP' 
+            ? `<span class="logo-brand">A<span class="logo-brand-accent">K</span>P</span>` 
+            : `<span class="logo-brand">${title}</span>`;
+            
         return `
         <nav class="navbar" role="navigation" aria-label="Main navigation">
-            <a href="${base}${backLink}" class="navbar__logo" aria-label="Go to dashboard">
-                <div class="navbar__logo-icon">⚡</div>
-                <span>${title}</span>
+            <a href="${base}${backLink}" class="navbar__logo" aria-label="Anti-Kuddus Protocol Home">
+                <div class="navbar__logo-icon">
+                    <svg class="logo-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logo-grad-dyn" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#6366f1" />
+                                <stop offset="100%" stop-color="#06b6d4" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M16 2L28 8V20L16 30L4 20V8L16 2Z" class="logo-icon-shield" stroke="url(#logo-grad-dyn)" stroke-width="2" stroke-linejoin="round" fill="rgba(99, 102, 241, 0.05)" />
+                        <path d="M17 7L10 15H16L15 25L22 14H16L17 7Z" class="logo-icon-lightning" fill="url(#logo-grad-dyn)" />
+                    </svg>
+                </div>
+                ${displayTitle}
             </a>
             <div class="navbar__actions">
                 <div class="navbar__user">

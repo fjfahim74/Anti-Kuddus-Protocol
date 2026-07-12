@@ -18,9 +18,20 @@
 
     <!-- Navbar -->
     <nav class="navbar" role="navigation" aria-label="Main navigation">
-        <a href="../dashboard.html" class="navbar__logo" aria-label="Dashboard">
-            <div class="navbar__logo-icon">⚡</div>
-            <span>AKP</span>
+        <a href="../index.html" class="navbar__logo" aria-label="Anti-Kuddus Protocol Home">
+            <div class="navbar__logo-icon">
+                <svg class="logo-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logo-grad-seats" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#6366f1" />
+                            <stop offset="100%" stop-color="#06b6d4" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M16 2L28 8V20L16 30L4 20V8L16 2Z" class="logo-icon-shield" stroke="url(#logo-grad-seats)" stroke-width="2" stroke-linejoin="round" fill="rgba(99, 102, 241, 0.05)" />
+                    <path d="M17 7L10 15H16L15 25L22 14H16L17 7Z" class="logo-icon-lightning" fill="url(#logo-grad-seats)" />
+                </svg>
+            </div>
+            <span class="logo-brand">A<span class="logo-brand-accent">K</span>P</span>
         </a>
         <div class="navbar__actions">
             <div class="navbar__user">

@@ -40,7 +40,7 @@
         .login-bg__orb--1 {
             width: 400px;
             height: 400px;
-            background: rgba(108, 99, 255, 0.2);
+            background: rgba(var(--accent-primary-rgb), 0.2);
             top: -15%;
             right: -10%;
             animation: orbFloat 20s ease-in-out infinite;
@@ -85,6 +85,13 @@
             justify-content: center;
             font-size: var(--text-2xl);
             box-shadow: var(--shadow-glow-primary);
+            transition: all 0.3s ease;
+        }
+
+        .login-card__logo--brand {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1.5px solid rgba(99, 102, 241, 0.25);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
         }
 
         .login-card__title {
@@ -184,15 +191,86 @@
     </a>
 
     <main class="login-page">
-        <div class="login-card glass-card--elevated">
+        <!-- Institution Setup Screen Card -->
+        <div class="login-card glass-card--elevated hidden" id="inst-setup-card">
             <div class="login-card__header">
-                <div class="login-card__logo">⚡</div>
+                <div class="login-card__logo">🏫</div>
+                <h1 class="login-card__title">Institution Setup</h1>
+                <p class="login-card__subtitle">Configure your active institution to begin</p>
+            </div>
+
+            <form class="login-form" id="inst-setup-form" novalidate style="display: flex; flex-direction: column; gap: var(--space-5);">
+                <div class="login-error hidden" id="inst-setup-error"></div>
+
+                <div class="form-group">
+                    <label class="form-label form-label--required" for="setup-school-name">Institution Name</label>
+                    <input
+                        type="text"
+                        id="setup-school-name"
+                        class="form-input"
+                        placeholder="e.g. Dhaka High School"
+                        required
+                        autocomplete="off"
+                    >
+                    <span class="form-error hidden" id="setup-school-error"></span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+                    <div class="form-group">
+                        <label class="form-label form-label--required" for="setup-class-name">Class</label>
+                        <input
+                            type="text"
+                            id="setup-class-name"
+                            class="form-input"
+                            placeholder="e.g. Class 10"
+                            required
+                            autocomplete="off"
+                        >
+                        <span class="form-error hidden" id="setup-class-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label form-label--required" for="setup-section-name">Section</label>
+                        <input
+                            type="text"
+                            id="setup-section-name"
+                            class="form-input"
+                            placeholder="e.g. Section B"
+                            required
+                            autocomplete="off"
+                        >
+                        <span class="form-error hidden" id="setup-section-error"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn--primary btn--full btn--lg" id="setup-inst-btn" style="margin-top: var(--space-2);">
+                    Create Institution
+                </button>
+            </form>
+        </div>
+
+        <!-- Sign In Card -->
+        <div class="login-card glass-card--elevated" id="signin-card">
+            <div class="login-card__header">
+                <div class="login-card__logo login-card__logo--brand">
+                    <svg class="logo-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                        <defs>
+                            <linearGradient id="logo-grad-login" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#4f46e5" />
+                                <stop offset="50%" stop-color="#6366f1" />
+                                <stop offset="100%" stop-color="#a855f7" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M16 2L28 8V20L16 30L4 20V8L16 2Z" class="logo-icon-shield" stroke="url(#logo-grad-login)" stroke-width="2" stroke-linejoin="round" fill="rgba(99, 102, 241, 0.05)" />
+                        <path d="M17 7L10 15H16L15 25L22 14H16L17 7Z" class="logo-icon-lightning" fill="url(#logo-grad-login)" />
+                    </svg>
+                </div>
                 <h1 class="login-card__title">Sign In</h1>
                 <p class="login-card__subtitle" id="login-subtitle">Welcome back to Anti-Kuddus Protocol</p>
             </div>
 
             <form class="login-form" id="login-form" novalidate>
-                <div class="login-error" id="login-error"></div>
+                <div class="login-error hidden" id="login-error"></div>
 
                 <div class="form-group">
                     <label class="form-label form-label--required" for="roll-number">Roll Number</label>
@@ -201,8 +279,6 @@
                         id="roll-number"
                         class="form-input"
                         placeholder="Enter your roll number"
-                        min="1"
-                        max="200"
                         required
                         autocomplete="off"
                     >
@@ -227,8 +303,12 @@
                 </button>
             </form>
 
-            <div class="login-footer">
+            <div class="login-footer" style="display: flex; flex-direction: column; gap: var(--space-3); align-items: center; justify-content: center; margin-top: var(--space-6);">
                 <p>Don't have an account? <a href="setup.html">Sign Up</a></p>
+                <button type="button" class="btn btn--ghost btn--sm" id="clear-data-btn" style="color: var(--text-muted); font-size: var(--text-xs); border: 1px solid var(--glass-border); padding: var(--space-1.5) var(--space-4); border-radius: var(--radius-md); background: rgba(239, 68, 68, 0.05); transition: all 0.2s; display: inline-flex; align-items: center; gap: var(--space-1.5);">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    Clear Data
+                </button>
             </div>
         </div>
     </main>

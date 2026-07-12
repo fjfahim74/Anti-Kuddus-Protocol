@@ -40,7 +40,7 @@
         .setup-bg__orb--1 {
             width: 450px;
             height: 450px;
-            background: rgba(108, 99, 255, 0.18);
+            background: rgba(var(--accent-primary-rgb), 0.18);
             top: -15%;
             left: -10%;
             animation: orbFloat 20s ease-in-out infinite;
@@ -85,6 +85,13 @@
             justify-content: center;
             font-size: var(--text-2xl);
             box-shadow: var(--shadow-glow-primary);
+            transition: all 0.3s ease;
+        }
+
+        .setup-card__logo--brand {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1.5px solid rgba(99, 102, 241, 0.25);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
         }
 
         .setup-card__title {
@@ -202,8 +209,8 @@
         }
 
         .role-option input:checked + label {
-            background: rgba(108, 99, 255, 0.12);
-            border-color: rgba(108, 99, 255, 0.4);
+            background: rgba(var(--accent-primary-rgb), 0.12);
+            border-color: rgba(var(--accent-primary-rgb), 0.4);
             color: var(--accent-primary);
         }
 
@@ -238,76 +245,70 @@
     </a>
 
     <main class="setup-page">
-        <div class="setup-card glass-card--elevated">
+        <!-- Sign Up Card -->
+        <div class="setup-card glass-card--elevated" id="signup-card">
             <div class="setup-card__header">
-                <div class="setup-card__logo">⚡</div>
+                <div class="setup-card__logo setup-card__logo--brand">
+                    <svg class="logo-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 32px; height: 32px;">
+                        <defs>
+                            <linearGradient id="logo-grad-setup" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#4f46e5" />
+                                <stop offset="50%" stop-color="#6366f1" />
+                                <stop offset="100%" stop-color="#a855f7" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M16 2L28 8V20L16 30L4 20V8L16 2Z" class="logo-icon-shield" stroke="url(#logo-grad-setup)" stroke-width="2" stroke-linejoin="round" fill="rgba(99, 102, 241, 0.05)" />
+                        <path d="M17 7L10 15H16L15 25L22 14H16L17 7Z" class="logo-icon-lightning" fill="url(#logo-grad-setup)" />
+                    </svg>
+                </div>
                 <h1 class="setup-card__title">Create Account</h1>
                 <p class="setup-card__subtitle" id="signup-subtitle">Register to access the Anti-Kuddus Protocol platform</p>
             </div>
 
             <form class="setup-form" id="setup-form" novalidate>
-                <!-- School Config Section (hidden if config already exists) -->
-                <div id="school-section">
+                <!-- Active Institution Fields -->
+                <div class="form-group">
+                    <label class="form-label form-label--required" for="school-name-display">Institution / School Name</label>
+                    <input
+                        type="text"
+                        id="school-name-display"
+                        class="form-input"
+                        placeholder="e.g. Dhaka High School"
+                        required
+                    >
+                    <span class="form-error hidden" id="school-name-error"></span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
                     <div class="form-group">
-                        <label class="form-label form-label--required" for="school-name">Institute / School Name</label>
+                        <label class="form-label form-label--required" for="class-name-display">Class</label>
                         <input
                             type="text"
-                            id="school-name"
+                            id="class-name-display"
                             class="form-input"
-                            placeholder="e.g. Dhaka Model High School"
+                            placeholder="e.g. Class 10"
                             required
-                            autocomplete="organization"
                         >
-                        <span class="form-error hidden" id="school-error"></span>
-                    </div>
-
-                    <div class="setup-row">
-                        <div class="form-group">
-                            <label class="form-label form-label--required" for="class-name">Class / Section</label>
-                            <input
-                                type="text"
-                                id="class-name"
-                                class="form-input"
-                                placeholder="e.g. 7-B"
-                                required
-                            >
-                            <span class="form-error hidden" id="class-error"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label form-label--required" for="student-count">Total Students</label>
-                            <input
-                                type="number"
-                                id="student-count"
-                                class="form-input"
-                                placeholder="e.g. 48"
-                                min="5"
-                                max="200"
-                                required
-                            >
-                            <span class="form-error hidden" id="count-error"></span>
-                        </div>
+                        <span class="form-error hidden" id="class-name-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" for="captain-name">1st Captain Name <span style="color: var(--text-muted); font-weight: 400;">(optional)</span></label>
+                        <label class="form-label form-label--required" for="section-name-display">Section</label>
                         <input
                             type="text"
-                            id="captain-name"
+                            id="section-name-display"
                             class="form-input"
-                            placeholder="e.g. Kuddus"
-                            autocomplete="off"
+                            placeholder="e.g. Section B"
+                            required
                         >
-                        <span class="form-hint">The person whose authority you're monitoring</span>
+                        <span class="form-error hidden" id="section-name-error"></span>
                     </div>
-
-                    <hr class="setup-divider">
                 </div>
 
                 <!-- Personal Details -->
-                <p class="setup-section-label">Your details</p>
+                <p class="setup-section-label" style="margin-top: var(--space-2); margin-bottom: var(--space-1); text-align: center; color: var(--text-muted); font-size: var(--text-sm);">Your details</p>
 
-                <div class="setup-row">
+                <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: var(--space-4);">
                     <div class="form-group">
                         <label class="form-label form-label--required" for="roll-number">Roll Number</label>
                         <input
@@ -315,15 +316,13 @@
                             id="roll-number"
                             class="form-input"
                             placeholder="e.g. 1"
-                            min="1"
-                            max="200"
                             required
                         >
                         <span class="form-error hidden" id="roll-error"></span>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label form-label--required" for="user-name">Your Name</label>
+                        <label class="form-label form-label--required" for="user-name">Full Name</label>
                         <input
                             type="text"
                             id="user-name"
@@ -337,28 +336,30 @@
 
                 <div class="form-group">
                     <label class="form-label">Your Role</label>
-                    <div class="role-selector" role="radiogroup" aria-label="Select your role">
+                    <div class="role-selector" role="radiogroup" aria-label="Select your role" style="grid-template-columns: repeat(2, 1fr);">
                         <div class="role-option">
                             <input type="radio" name="role" id="role-student" value="student" checked>
                             <label for="role-student">Student</label>
                         </div>
                         <div class="role-option">
-                            <input type="radio" name="role" id="role-captain-2" value="captain_2nd">
-                            <label for="role-captain-2">2nd Captain</label>
-                        </div>
-                        <div class="role-option">
-                            <input type="radio" name="role" id="role-captain-3" value="captain_3rd">
-                            <label for="role-captain-3">3rd Captain</label>
-                        </div>
-                        <div class="role-option">
-                            <input type="radio" name="role" id="role-cr" value="cr">
-                            <label for="role-cr">Class Rep</label>
+                            <input type="radio" name="role" id="role-captain" value="captain">
+                            <label for="role-captain">Captain</label>
                         </div>
                     </div>
                 </div>
 
+                <!-- Captain designation selection (conditional) -->
+                <div class="form-group hidden" id="captain-designation-container">
+                    <label class="form-label form-label--required" for="captain-designation">Select Captain Option</label>
+                    <select id="captain-designation" class="form-input" style="background: rgba(30, 27, 75, 0.6); border: 1px solid var(--glass-border); color: var(--text-primary); cursor: pointer; padding: var(--space-3); border-radius: var(--radius-md); width: 100%;">
+                        <option value="captain">Captain 1</option>
+                        <option value="captain_2nd">Captain 2</option>
+                        <option value="captain_3rd">Captain 3</option>
+                    </select>
+                </div>
+
                 <!-- Password -->
-                <div class="setup-row">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
                     <div class="form-group">
                         <label class="form-label form-label--required" for="password">Password</label>
                         <input
@@ -367,7 +368,6 @@
                             class="form-input"
                             placeholder="Create password"
                             required
-                            minlength="4"
                         >
                         <span class="form-error hidden" id="password-error"></span>
                     </div>
@@ -385,7 +385,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn--primary btn--full btn--lg" id="setup-btn">
+                <button type="submit" class="btn btn--primary btn--full btn--lg" id="setup-btn" style="margin-top: var(--space-2);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                     Sign Up
                 </button>
@@ -402,27 +402,74 @@
     <script src="js/ui.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var config = Storage.get('config');
-            var hasConfig = config && config.setupComplete;
+            // Guard: if already logged in, redirect to Dashboard
+            var session = Storage.get('session');
+            if (session && session.isLoggedIn) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
 
-            // If config exists, hide school section (another student signing up)
-            if (hasConfig) {
-                document.getElementById('school-section').style.display = 'none';
-                document.getElementById('signup-subtitle').textContent = config.schoolName + ' — Class ' + config.className;
-                var rollInput = document.getElementById('roll-number');
-                if (rollInput) rollInput.max = config.studentCount;
+            var config = Storage.get('config') || {};
+
+            var instSetupCard = document.getElementById('inst-setup-card');
+            var signupCard = document.getElementById('signup-card');
+
+            // We always show the signup card directly
+            if (instSetupCard) instSetupCard.classList.add('hidden');
+            if (signupCard) signupCard.classList.remove('hidden');
+
+            // Populate active institution fields (if we have config values)
+            var instNameDisplay = document.getElementById('school-name-display');
+            var classNameDisplay = document.getElementById('class-name-display');
+            var sectionNameDisplay = document.getElementById('section-name-display');
+
+            var cls = config.class || (config.className ? config.className.split(' ')[0] : '');
+            var sec = config.section || (config.className ? config.className.split(' ').slice(1).join(' ') : '');
+
+            if (instNameDisplay) instNameDisplay.value = config.schoolName || '';
+            if (classNameDisplay) classNameDisplay.value = cls;
+            if (sectionNameDisplay) sectionNameDisplay.value = sec;
+
+            var signupSubtitle = document.getElementById('signup-subtitle');
+            if (signupSubtitle) {
+                if (config.schoolName) {
+                    signupSubtitle.textContent = config.schoolName + ' — ' + cls + ' ' + sec;
+                } else {
+                    signupSubtitle.textContent = 'Register to access the Anti-Kuddus Protocol platform';
+                }
             }
 
             var form = document.getElementById('setup-form');
-            form.addEventListener('submit', handleSignUp);
+            if (form) form.addEventListener('submit', handleSignUp);
 
-            // Clear errors on input
-            var fields = ['school-name', 'class-name', 'student-count', 'roll-number', 'user-name', 'password', 'confirm-password'];
-            fields.forEach(function (id) {
+            // Toggle Captain Designation Dropdown
+            var roleRadios = document.querySelectorAll('input[name="role"]');
+            var captainContainer = document.getElementById('captain-designation-container');
+            if (captainContainer) {
+                roleRadios.forEach(function (radio) {
+                    radio.addEventListener('change', function () {
+                        if (this.value === 'captain' && this.checked) {
+                            captainContainer.classList.remove('hidden');
+                        } else {
+                            captainContainer.classList.add('hidden');
+                        }
+                    });
+                });
+                // Initial check
+                var selectedRole = document.querySelector('input[name="role"]:checked');
+                if (selectedRole && selectedRole.value === 'captain') {
+                    captainContainer.classList.remove('hidden');
+                } else {
+                    captainContainer.classList.add('hidden');
+                }
+            }
+
+            // Clear signup errors on input
+            ['roll-number', 'user-name', 'password', 'confirm-password', 'school-name-display', 'class-name-display', 'section-name-display'].forEach(function (id) {
                 var el = document.getElementById(id);
                 if (el) el.addEventListener('input', function () {
-                    var errorMap = { 'school-name': 'school', 'class-name': 'class', 'student-count': 'count', 'roll-number': 'roll', 'user-name': 'name', 'password': 'password', 'confirm-password': 'confirm' };
-                    clearError(errorMap[id]);
+                    var fieldKey = id.replace('user-', '').replace('-number', '').replace('-display', '');
+                    clearError(fieldKey, id);
                 });
             });
         });
@@ -430,84 +477,77 @@
         function handleSignUp(e) {
             e.preventDefault();
 
-            var config = Storage.get('config');
-            var hasConfig = config && config.setupComplete;
+            var config = Storage.get('config') || {};
 
-            var schoolName, className, studentCount, captainName;
-
-            if (hasConfig) {
-                schoolName = config.schoolName;
-                className = config.className;
-                studentCount = config.studentCount;
-                captainName = config.captainName;
-            } else {
-                schoolName = document.getElementById('school-name').value.trim();
-                className = document.getElementById('class-name').value.trim();
-                studentCount = parseInt(document.getElementById('student-count').value, 10);
-                captainName = document.getElementById('captain-name').value.trim();
-            }
+            var schoolName = document.getElementById('school-name-display').value.trim();
+            var classVal = document.getElementById('class-name-display').value.trim();
+            var sectionVal = document.getElementById('section-name-display').value.trim();
 
             var rollNumber = parseInt(document.getElementById('roll-number').value, 10);
             var userName = document.getElementById('user-name').value.trim();
             var roleInput = document.querySelector('input[name="role"]:checked');
-            var role = roleInput ? roleInput.value : 'student';
+            var baseRole = roleInput ? roleInput.value : 'student';
+            
+            // Map the selected captain designation if captain is selected
+            var role = baseRole;
+            if (baseRole === 'captain') {
+                var designInput = document.getElementById('captain-designation');
+                if (designInput) {
+                    role = designInput.value; // 'captain', 'captain_2nd', or 'captain_3rd'
+                }
+            }
+
             var password = document.getElementById('password').value;
             var confirmPassword = document.getElementById('confirm-password').value;
 
             var hasError = false;
 
-            // Validate school fields only if no config
-            if (!hasConfig) {
-                if (!schoolName) { showError('school', 'School name is required'); hasError = true; }
-                if (!className) { showError('class', 'Class / Section is required'); hasError = true; }
-                if (isNaN(studentCount) || studentCount < 5 || studentCount > 200) { showError('count', 'Enter a number between 5 and 200'); hasError = true; }
-            }
+            if (!schoolName) { showError('school-name', 'Institution Name is required', 'school-name-display'); hasError = true; }
+            if (!classVal) { showError('class-name', 'Class is required', 'class-name-display'); hasError = true; }
+            if (!sectionVal) { showError('section-name', 'Section is required', 'section-name-display'); hasError = true; }
 
-            var maxStudents = studentCount || (config ? config.studentCount : 200);
-            if (isNaN(rollNumber) || rollNumber < 1 || rollNumber > maxStudents) {
-                showError('roll', 'Enter a valid roll number (1-' + maxStudents + ')');
-                hasError = true;
-            }
+            if (isNaN(rollNumber) || rollNumber < 1) { showError('roll', 'Roll Number is required', 'roll-number'); hasError = true; }
+            if (!userName) { showError('name', 'Full Name is required', 'user-name'); hasError = true; }
+            if (!password) { showError('password', 'Password is required', 'password'); hasError = true; }
+            if (!confirmPassword) { showError('confirm', 'Confirm Password is required', 'confirm-password'); hasError = true; }
+            if (password && confirmPassword && password !== confirmPassword) { showError('confirm', 'Passwords do not match', 'confirm-password'); hasError = true; }
 
-            if (!userName || userName.length < 2) { showError('name', 'Name is required (min 2 chars)'); hasError = true; }
-            if (!password || password.length < 4) { showError('password', 'Min 4 characters'); hasError = true; }
-            if (password !== confirmPassword) { showError('confirm', 'Passwords do not match'); hasError = true; }
-
-            // Check if roll already registered
+            // Check uniqueness of Roll Number in localStorage
             var users = Storage.get('users') || [];
             var existing = users.find(function (u) { return u.rollNumber === rollNumber; });
             if (existing) {
-                showError('roll', 'Roll #' + rollNumber + ' is already registered');
+                showError('roll', 'Roll Number must be unique. Already registered!', 'roll-number');
                 hasError = true;
             }
 
             if (hasError) {
-                var card = document.querySelector('.setup-card');
-                card.classList.add('shake');
-                card.addEventListener('animationend', function () { card.classList.remove('shake'); }, { once: true });
+                var card = document.getElementById('signup-card');
+                if (card) {
+                    card.classList.add('shake');
+                    card.addEventListener('animationend', function () { card.classList.remove('shake'); }, { once: true });
+                }
                 return;
             }
 
-            var setupBtn = document.getElementById('setup-btn');
-            UI.setLoading(setupBtn, true);
+            var signupBtn = document.getElementById('setup-btn');
+            UI.setLoading(signupBtn, true);
 
             setTimeout(function () {
-                // Save config if first user
-                if (!hasConfig) {
-                    var newConfig = {
-                        schoolName: schoolName,
-                        className: className,
-                        studentCount: studentCount,
-                        captainName: captainName || 'Captain',
-                        theme: 'dark',
-                        soundEnabled: true,
-                        setupComplete: true,
-                        setupDate: new Date().toISOString()
-                    };
-                    Storage.set('config', newConfig);
-                }
+                var isCap = role === 'captain' || role === 'captain_2nd' || role === 'captain_3rd';
+                // Save new config upon signing up
+                var newConfig = {
+                    schoolName: schoolName,
+                    class: classVal,
+                    section: sectionVal,
+                    className: classVal + ' ' + sectionVal,
+                    studentCount: config.studentCount || 60,
+                    captainName: isCap ? userName : (config.captainName || 'Captain'),
+                    theme: config.theme || 'dark',
+                    setupComplete: true,
+                    setupDate: new Date().toISOString()
+                };
+                Storage.set('config', newConfig);
 
-                // Save user to users array
                 var newUser = {
                     rollNumber: rollNumber,
                     name: userName,
@@ -517,7 +557,7 @@
                 };
                 Storage.push('users', newUser);
 
-                // Create session
+                // Auto-login the user by establishing the session immediately
                 var session = {
                     rollNumber: rollNumber,
                     name: userName,
@@ -527,27 +567,25 @@
                 };
                 Storage.set('session', session);
 
-                UI.toast('Welcome, ' + userName + '!', 'success');
+                UI.toast('Account created successfully! Redirecting...', 'success');
 
                 setTimeout(function () {
                     window.location.href = 'dashboard.html';
-                }, 500);
+                }, 1000);
             }, 600);
         }
 
-        function showError(field, message) {
+        function showError(field, message, inputId) {
             var errorEl = document.getElementById(field + '-error');
-            var inputMap = { school: 'school-name', class: 'class-name', count: 'student-count', roll: 'roll-number', name: 'user-name', password: 'password', confirm: 'confirm-password' };
-            var inputEl = document.getElementById(inputMap[field]);
+            var inputEl = document.getElementById(inputId);
 
             if (errorEl) { errorEl.textContent = message; errorEl.classList.remove('hidden'); }
             if (inputEl) { inputEl.classList.add('form-input--error'); }
         }
 
-        function clearError(field) {
+        function clearError(field, inputId) {
             var errorEl = document.getElementById(field + '-error');
-            var inputMap = { school: 'school-name', class: 'class-name', count: 'student-count', roll: 'roll-number', name: 'user-name', password: 'password', confirm: 'confirm-password' };
-            var inputEl = document.getElementById(inputMap[field]);
+            var inputEl = document.getElementById(inputId);
 
             if (errorEl) { errorEl.textContent = ''; errorEl.classList.add('hidden'); }
             if (inputEl) { inputEl.classList.remove('form-input--error'); }
