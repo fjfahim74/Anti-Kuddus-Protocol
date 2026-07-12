@@ -1,127 +1,132 @@
 const Auth = (function () {
     function init() {
-        const form = document.getElementById('login-form');
+        var form = document.getElementById('login-form');
         if (!form) return;
 
-        form.addEventListener('submit', handleLogin);
+        form.addEventListener('submit', handleSignIn);
 
-        const rollInput = document.getElementById('roll-number');
-        const nameInput = document.getElementById('name');
+        var rollInput = document.getElementById('roll-number');
+        var passInput = document.getElementById('password');
 
-        rollInput.addEventListener('input', () => clearError('roll'));
-        nameInput.addEventListener('input', () => clearError('name'));
+        if (rollInput) rollInput.addEventListener('input', function () { clearFieldError('roll'); hideGlobalError(); });
+        if (passInput) passInput.addEventListener('input', function () { clearFieldError('password'); hideGlobalError(); });
 
         populateFromConfig();
     }
 
     function populateFromConfig() {
-        const config = Storage.get('config');
+        var config = Storage.get('config');
         if (!config) return;
 
-        const subtitle = document.getElementById('login-subtitle');
+        var subtitle = document.getElementById('login-subtitle');
         if (subtitle) {
             subtitle.textContent = config.schoolName + ' — Class ' + config.className;
         }
 
-        const rollInput = document.getElementById('roll-number');
+        var rollInput = document.getElementById('roll-number');
         if (rollInput) {
             rollInput.max = config.studentCount;
-            rollInput.placeholder = 'Enter roll number (1-' + config.studentCount + ')';
-        }
-
-        const rollHint = document.getElementById('roll-hint');
-        if (rollHint) {
-            rollHint.textContent = 'Your class roll number between 1 and ' + config.studentCount;
+            rollInput.placeholder = 'Roll number (1-' + config.studentCount + ')';
         }
     }
 
-    function handleLogin(e) {
+    function handleSignIn(e) {
         e.preventDefault();
 
-        const config = Storage.get('config');
-        const maxStudents = config ? config.studentCount : 60;
+        var rollInput = document.getElementById('roll-number');
+        var passInput = document.getElementById('password');
+        var loginBtn = document.getElementById('login-btn');
 
-        const rollInput = document.getElementById('roll-number');
-        const nameInput = document.getElementById('name');
-        const roleInput = document.querySelector('input[name="role"]:checked');
-        const loginBtn = document.getElementById('login-btn');
+        var rollNumber = parseInt(rollInput.value, 10);
+        var password = passInput.value;
 
-        const rollNumber = parseInt(rollInput.value, 10);
-        const name = nameInput.value.trim();
-        const role = roleInput ? roleInput.value : 'student';
+        var hasError = false;
 
-        let hasError = false;
-
-        const rollError = Utils.validateRollNumber(rollInput.value, maxStudents);
-        if (rollError) {
-            showError('roll', rollError);
+        if (isNaN(rollNumber) || rollNumber < 1) {
+            showFieldError('roll', 'Enter a valid roll number');
             hasError = true;
         }
 
-        const nameError = Utils.validateRequired(name, 'Name') || Utils.validateMinLength(name, 2, 'Name');
-        if (nameError) {
-            showError('name', nameError);
+        if (!password) {
+            showFieldError('password', 'Password is required');
             hasError = true;
         }
 
         if (hasError) {
-            const card = document.querySelector('.login-card');
-            card.classList.add('shake');
-            card.addEventListener('animationend', () => card.classList.remove('shake'), { once: true });
+            shakeCard();
+            return;
+        }
+
+        var users = Storage.get('users') || [];
+        var user = users.find(function (u) { return u.rollNumber === rollNumber; });
+
+        if (!user) {
+            showGlobalError('No account found with Roll #' + rollNumber + '. Please sign up first.');
+            shakeCard();
+            return;
+        }
+
+        if (user.password !== password) {
+            showGlobalError('Incorrect password. Please try again.');
+            shakeCard();
             return;
         }
 
         UI.setLoading(loginBtn, true);
 
-        setTimeout(() => {
-            const session = {
-                rollNumber: rollNumber,
-                name: name,
-                role: role,
+        setTimeout(function () {
+            var session = {
+                rollNumber: user.rollNumber,
+                name: user.name,
+                role: user.role,
                 isLoggedIn: true,
                 loginTime: new Date().toISOString()
             };
 
             Storage.set('session', session);
-            UI.toast('Welcome, ' + name + '!', 'success');
+            UI.toast('Welcome back, ' + user.name + '!', 'success');
 
-            setTimeout(() => {
+            setTimeout(function () {
                 window.location.href = 'dashboard.html';
             }, 500);
         }, 600);
     }
 
-    function showError(field, message) {
-        const errorEl = document.getElementById(field + '-error');
-        const inputEl = document.getElementById(field === 'roll' ? 'roll-number' : field);
+    function showFieldError(field, message) {
+        var errorEl = document.getElementById(field + '-error');
+        var inputEl = document.getElementById(field === 'roll' ? 'roll-number' : field);
 
-        if (errorEl) {
-            errorEl.textContent = message;
-            errorEl.classList.remove('hidden');
-        }
-
-        if (inputEl) {
-            inputEl.classList.add('form-input--error');
-        }
+        if (errorEl) { errorEl.textContent = message; errorEl.classList.remove('hidden'); }
+        if (inputEl) { inputEl.classList.add('form-input--error'); }
     }
 
-    function clearError(field) {
-        const errorEl = document.getElementById(field + '-error');
-        const inputEl = document.getElementById(field === 'roll' ? 'roll-number' : field);
+    function clearFieldError(field) {
+        var errorEl = document.getElementById(field + '-error');
+        var inputEl = document.getElementById(field === 'roll' ? 'roll-number' : field);
 
-        if (errorEl) {
-            errorEl.textContent = '';
-            errorEl.classList.add('hidden');
-        }
+        if (errorEl) { errorEl.textContent = ''; errorEl.classList.add('hidden'); }
+        if (inputEl) { inputEl.classList.remove('form-input--error'); }
+    }
 
-        if (inputEl) {
-            inputEl.classList.remove('form-input--error');
+    function showGlobalError(message) {
+        var el = document.getElementById('login-error');
+        if (el) { el.textContent = message; el.style.display = 'block'; }
+    }
+
+    function hideGlobalError() {
+        var el = document.getElementById('login-error');
+        if (el) { el.textContent = ''; el.style.display = 'none'; }
+    }
+
+    function shakeCard() {
+        var card = document.querySelector('.login-card');
+        if (card) {
+            card.classList.add('shake');
+            card.addEventListener('animationend', function () { card.classList.remove('shake'); }, { once: true });
         }
     }
 
     document.addEventListener('DOMContentLoaded', init);
 
-    return {
-        handleLogin
-    };
+    return {};
 })();

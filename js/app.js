@@ -10,7 +10,6 @@ const App = (function () {
     ];
 
     const SETUP_REQUIRED_PAGES = [
-        'login.html',
         'dashboard.html',
         'complaint.html',
         'seats.html',
@@ -37,11 +36,6 @@ const App = (function () {
 
         if (needsSetup && (!config || !config.setupComplete)) {
             Utils.navigate('setup.html');
-            return;
-        }
-
-        if (currentPage === 'setup.html' && config && config.setupComplete) {
-            Utils.navigate('login.html');
             return;
         }
     }
