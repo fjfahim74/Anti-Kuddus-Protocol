@@ -1,0 +1,151 @@
+const App = (function () {
+    const PROTECTED_PAGES = [
+        'dashboard.html',
+        'complaint.html',
+        'seats.html',
+        'study.html',
+        'corruption.html',
+        'sos.html',
+        'rules.html'
+    ];
+
+    function init() {
+        checkAuth();
+        initNavbar();
+        initSeedData();
+    }
+
+    function checkAuth() {
+        const session = Storage.get('session');
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+
+        const isProtected = PROTECTED_PAGES.some(
+            (p) => currentPage === p || currentPage.endsWith('/' + p)
+        );
+
+        if (isProtected && (!session || !session.isLoggedIn)) {
+            Utils.navigate('login.html');
+            return;
+        }
+
+        if (currentPage === 'login.html' && session && session.isLoggedIn) {
+            Utils.navigate('dashboard.html');
+            return;
+        }
+    }
+
+    function getSession() {
+        return Storage.get('session');
+    }
+
+    function isLoggedIn() {
+        const session = getSession();
+        return session && session.isLoggedIn;
+    }
+
+    function logout() {
+        Storage.remove('session');
+        Utils.navigate('login.html');
+    }
+
+    function initNavbar() {
+        const navbar = document.querySelector('.navbar');
+        if (!navbar) return;
+
+        const session = getSession();
+        if (!session) return;
+
+        const userEl = navbar.querySelector('.navbar__user');
+        if (userEl) {
+            const avatar = userEl.querySelector('.navbar__avatar');
+            const nameEl = userEl.querySelector('.navbar__name');
+
+            if (avatar) avatar.textContent = Utils.getInitials(session.name);
+            if (nameEl) nameEl.textContent = session.name;
+        }
+
+        const logoutBtn = navbar.querySelector('.navbar__logout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                UI.confirm('Are you sure you want to logout?', () => {
+                    logout();
+                });
+            });
+        }
+    }
+
+    function initSeedData() {
+        if (!Storage.has('rules')) {
+            Storage.set('rules', getDefaultRules());
+        }
+    }
+
+    function getDefaultRules() {
+        return [
+            { id: 'rule_001', text: 'Students must wear full uniform on all school days', category: 'uniform', keywords: ['uniform', 'dress', 'clothes', 'shirt', 'pants', 'tie'] },
+            { id: 'rule_002', text: 'Students must arrive before 8:00 AM', category: 'attendance', keywords: ['late', 'time', 'arrive', 'morning', 'attendance', 'punctual'] },
+            { id: 'rule_003', text: 'Mobile phones are not allowed on school premises', category: 'discipline', keywords: ['phone', 'mobile', 'smartphone', 'device', 'gadget'] },
+            { id: 'rule_004', text: 'Students must bring their own stationery and books', category: 'supplies', keywords: ['pen', 'pencil', 'book', 'notebook', 'eraser', 'stationery'] },
+            { id: 'rule_005', text: 'No food or drinks allowed inside the classroom during class hours', category: 'discipline', keywords: ['food', 'eat', 'drink', 'snack', 'water', 'tiffin'] },
+            { id: 'rule_006', text: 'The class captain is responsible for maintaining discipline in the absence of the teacher', category: 'governance', keywords: ['captain', 'discipline', 'leader', 'authority', 'maintain', 'order'] },
+            { id: 'rule_007', text: 'Students must complete and submit homework on time', category: 'academic', keywords: ['homework', 'assignment', 'submit', 'deadline', 'work'] },
+            { id: 'rule_008', text: 'Bullying, harassment, or any form of intimidation is strictly prohibited', category: 'discipline', keywords: ['bully', 'harass', 'threat', 'intimidate', 'fight', 'hit', 'abuse'] },
+            { id: 'rule_009', text: 'Students must respect all teachers, staff, and fellow students', category: 'conduct', keywords: ['respect', 'behavior', 'manners', 'polite', 'rude'] },
+            { id: 'rule_010', text: 'The class captain cannot impose fines or collect money from students', category: 'governance', keywords: ['money', 'fine', 'collect', 'pay', 'bribe', 'charge', 'fee'] },
+            { id: 'rule_011', text: 'Any student can report misconduct to the class teacher without fear of retaliation', category: 'governance', keywords: ['report', 'complaint', 'misconduct', 'teacher', 'retaliation'] },
+            { id: 'rule_012', text: 'Students must keep the classroom clean and tidy', category: 'discipline', keywords: ['clean', 'tidy', 'trash', 'litter', 'mess', 'sweep'] },
+            { id: 'rule_013', text: 'Exam cheating or copying leads to immediate disqualification', category: 'academic', keywords: ['cheat', 'copy', 'exam', 'test', 'unfair'] },
+            { id: 'rule_014', text: 'Students must participate in morning assembly and national anthem', category: 'attendance', keywords: ['assembly', 'anthem', 'morning', 'prayer', 'flag'] },
+            { id: 'rule_015', text: 'Damaging school property will result in a fine and disciplinary action', category: 'discipline', keywords: ['damage', 'break', 'property', 'desk', 'chair', 'wall', 'vandal'] }
+        ];
+    }
+
+    function getNavbarHTML(options = {}) {
+        const { backLink = 'dashboard.html', title = 'AKP' } = options;
+        const base = Utils.getBasePath();
+        return `
+        <nav class="navbar" role="navigation" aria-label="Main navigation">
+            <a href="${base}${backLink}" class="navbar__logo" aria-label="Go to dashboard">
+                <div class="navbar__logo-icon">⚡</div>
+                <span>${title}</span>
+            </a>
+            <div class="navbar__actions">
+                <div class="navbar__user">
+                    <span class="navbar__name"></span>
+                    <div class="navbar__avatar"></div>
+                </div>
+                <button class="btn btn--ghost btn--sm navbar__logout" aria-label="Logout">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </nav>
+        `;
+    }
+
+    function getPageHeaderHTML(title, subtitle, backLink) {
+        const base = Utils.getBasePath();
+        return `
+        <div class="page-header">
+            <a href="${base}${backLink || 'dashboard.html'}" class="page-header__back" aria-label="Go back">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </a>
+            <div class="page-header__info">
+                <h1 class="page-header__title">${title}</h1>
+                ${subtitle ? `<p class="page-header__subtitle">${subtitle}</p>` : ''}
+            </div>
+        </div>
+        `;
+    }
+
+    return {
+        init,
+        getSession,
+        isLoggedIn,
+        logout,
+        getNavbarHTML,
+        getPageHeaderHTML
+    };
+})();
+
+document.addEventListener('DOMContentLoaded', () => App.init());
