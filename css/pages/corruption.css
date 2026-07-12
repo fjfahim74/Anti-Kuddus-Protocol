@@ -1,0 +1,325 @@
+/* ============================================
+   CORRUPTION LEDGER
+   ============================================ */
+
+/* --- Stats Row --- */
+.corruption-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+/* --- Form Card --- */
+.corruption-form-card {
+    padding: var(--space-8);
+}
+
+.corruption-form-card__title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    margin-bottom: var(--space-6);
+}
+
+.corruption-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.corruption-form__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+
+/* --- Toolbar --- */
+.corruption-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    margin-bottom: var(--space-5);
+    border-radius: var(--radius-lg);
+}
+
+.corruption-toolbar__filters {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.corruption-toolbar .form-input--sm {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+    min-width: 140px;
+}
+
+/* --- Records --- */
+.corruption-records {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.record-card {
+    padding: var(--space-5) var(--space-6);
+    border-left: 3px solid var(--accent-primary);
+    transition: all var(--transition-base);
+}
+
+.record-card:hover {
+    border-left-color: var(--accent-danger);
+    transform: translateX(4px);
+}
+
+.record-card--bribery { border-left-color: var(--accent-danger); }
+.record-card--favoritism { border-left-color: var(--accent-warning); }
+.record-card--abuse_power { border-left-color: #f97316; }
+.record-card--theft { border-left-color: var(--accent-danger); }
+.record-card--intimidation { border-left-color: #dc2626; }
+.record-card--false_reporting { border-left-color: var(--accent-info); }
+.record-card--nepotism { border-left-color: #a855f7; }
+.record-card--other { border-left-color: var(--text-muted); }
+
+.record-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-3);
+}
+
+.record-card__category {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.record-card__category--bribery { color: var(--accent-danger); }
+.record-card__category--favoritism { color: var(--accent-warning); }
+.record-card__category--abuse_power { color: #f97316; }
+.record-card__category--theft { color: var(--accent-danger); }
+.record-card__category--intimidation { color: #dc2626; }
+.record-card__category--false_reporting { color: var(--accent-info); }
+.record-card__category--nepotism { color: #a855f7; }
+.record-card__category--other { color: var(--text-muted); }
+
+.record-card__actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.record-card__delete {
+    color: var(--text-muted);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.record-card__delete:hover {
+    color: var(--accent-danger);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.record-card__body {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: var(--leading-relaxed);
+    margin-bottom: var(--space-3);
+}
+
+.record-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.record-card__meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.record-card__meta-item svg {
+    opacity: 0.7;
+}
+
+/* --- Charts --- */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+}
+
+.chart-card {
+    padding: var(--space-6);
+}
+
+.chart-card--full {
+    grid-column: 1 / -1;
+}
+
+.chart-card__title {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    margin-bottom: var(--space-5);
+}
+
+/* Bar Chart */
+.chart-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.chart-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.chart-bar__label {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    min-width: 90px;
+    text-align: right;
+}
+
+.chart-bar__track {
+    flex: 1;
+    height: 24px;
+    background: var(--glass-bg);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+}
+
+.chart-bar__fill {
+    height: 100%;
+    border-radius: var(--radius-sm);
+    transition: width 0.6s ease;
+    min-width: 2px;
+}
+
+.chart-bar__fill--primary { background: var(--accent-primary); }
+.chart-bar__fill--danger { background: var(--accent-danger); }
+.chart-bar__fill--warning { background: var(--accent-warning); }
+.chart-bar__fill--info { background: var(--accent-info); }
+.chart-bar__fill--secondary { background: var(--accent-secondary); }
+.chart-bar__fill--purple { background: #a855f7; }
+.chart-bar__fill--orange { background: #f97316; }
+
+.chart-bar__value {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: var(--text-muted);
+    min-width: 24px;
+}
+
+/* Timeline Chart */
+.chart-timeline {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-2);
+    height: 150px;
+    padding-top: var(--space-4);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.chart-timeline__bar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.chart-timeline__fill {
+    width: 100%;
+    max-width: 40px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    transition: height 0.6s ease;
+    min-height: 4px;
+}
+
+.chart-timeline__label {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: var(--space-2);
+}
+
+.chart-timeline__count {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    color: var(--text-secondary);
+}
+
+/* Empty chart state */
+.chart-empty {
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+}
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+    .corruption-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .corruption-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-3);
+    }
+
+    .corruption-form__row {
+        grid-template-columns: 1fr;
+    }
+
+    .corruption-toolbar {
+        flex-direction: column;
+        gap: var(--space-3);
+        align-items: stretch;
+    }
+
+    .corruption-toolbar__filters {
+        flex-direction: column;
+    }
+
+    .corruption-toolbar .form-input--sm {
+        min-width: unset;
+    }
+
+    .chart-bar__label {
+        min-width: 70px;
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .corruption-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .record-card {
+        padding: var(--space-4);
+    }
+
+    .record-card__meta {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Study Assistant — Anti-Kuddus Protocol</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/pages/study.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <!-- Navbar -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <a href="../dashboard.html" class="navbar__logo" aria-label="Dashboard">
+            <div class="navbar__logo-icon">⚡</div>
+            <span>AKP</span>
+        </a>
+        <div class="navbar__actions">
+            <div class="navbar__user">
+                <span class="navbar__name"></span>
+                <div class="navbar__avatar"></div>
+            </div>
+            <button class="btn btn--ghost btn--sm navbar__logout" aria-label="Logout">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main id="main" class="page">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header animate-in">
+                <a href="../dashboard.html" class="page-header__back" aria-label="Back to dashboard">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </a>
+                <div class="page-header__info">
+                    <h1 class="page-header__title">AI Study Assistant</h1>
+                    <p class="page-header__subtitle">Get AI-powered syllabus summaries with Google Gemini</p>
+                </div>
+            </div>
+
+            <!-- API Key Banner (shown if no key) -->
+            <div class="api-key-banner glass-card" id="api-key-banner">
+                <div class="api-key-banner__content">
+                    <div class="api-key-banner__icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                    </div>
+                    <div class="api-key-banner__text">
+                        <strong>Gemini API Key Required</strong>
+                        <p>Enter your free Google Gemini API key to use the AI assistant. Your key stays in your browser only.</p>
+                    </div>
+                </div>
+                <div class="api-key-banner__form">
+                    <input type="password" id="api-key-input" class="form-input" placeholder="Paste your Gemini API key here...">
+                    <button class="btn btn--primary btn--sm" id="save-key-btn">Save Key</button>
+                </div>
+                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="api-key-banner__link">
+                    Get a free API key from Google AI Studio
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+            </div>
+
+            <!-- Main Layout -->
+            <div class="study-layout">
+                <!-- Input Panel -->
+                <div class="study-input-panel">
+                    <div class="glass-card study-input-card">
+                        <div class="study-input-card__header">
+                            <h3>Paste Your Syllabus</h3>
+                            <button class="btn btn--ghost btn--sm" id="clear-input-btn" aria-label="Clear input">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                Clear
+                            </button>
+                        </div>
+
+                        <textarea id="syllabus-input" class="form-input study-textarea" rows="10" placeholder="Paste your syllabus content, chapter text, or study material here...
+
+Example:
+Chapter 5: Photosynthesis
+Photosynthesis is the process by which green plants use sunlight to synthesize food from carbon dioxide and water..."></textarea>
+
+                        <div class="study-options">
+                            <div class="form-group">
+                                <label class="form-label" for="summary-type">Summary Type</label>
+                                <select id="summary-type" class="form-input">
+                                    <option value="bullet">Bullet Points</option>
+                                    <option value="brief">Brief Summary</option>
+                                    <option value="detailed">Detailed Notes</option>
+                                    <option value="qa">Q&A Format</option>
+                                    <option value="explain">Explain Like I'm 12</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn--primary btn--lg btn--full" id="generate-summary-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                Generate Summary
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- API Key Management -->
+                    <div class="glass-card api-key-manage" id="api-key-manage" style="display: none;">
+                        <div class="api-key-manage__header">
+                            <span class="api-key-manage__status">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                API Key Connected
+                            </span>
+                            <button class="btn btn--ghost btn--sm" id="change-key-btn">Change Key</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Output Panel -->
+                <div class="study-output-panel">
+                    <div class="glass-card study-output-card">
+                        <div class="study-output-card__header">
+                            <h3>AI Summary</h3>
+                            <div class="study-output-card__actions" id="output-actions" style="display: none;">
+                                <button class="btn btn--ghost btn--sm" id="copy-output-btn" data-tooltip="Copy to clipboard">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="study-output" id="study-output">
+                            <div class="study-output__empty">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
+                                <p>Paste your syllabus and click <strong>Generate Summary</strong> to see AI-generated notes here.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History -->
+                    <div class="glass-card study-history-card">
+                        <div class="study-history-card__header">
+                            <h3>History <span class="text-muted" id="history-count">(0)</span></h3>
+                            <button class="btn btn--ghost btn--sm" id="clear-history-btn">Clear All</button>
+                        </div>
+                        <div class="study-history" id="study-history">
+                            <div class="empty-state" style="padding: var(--space-6) var(--space-4);">
+                                <p class="empty-state__text">No summaries generated yet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/storage.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/modules/study.js"></script>
+</body>
+</html>
