@@ -1,0 +1,354 @@
+/* ============================================
+   SEAT PLANNER
+   ============================================ */
+
+/* --- Layout --- */
+.seats-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: var(--space-6);
+    align-items: start;
+}
+
+/* --- Left Panel --- */
+.seats-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.seats-input-card__title,
+.seats-controls__title {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    margin-bottom: var(--space-5);
+}
+
+/* --- Add Form --- */
+.seats-add-form__row {
+    display: grid;
+    grid-template-columns: 1fr 60px 80px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.seats-add-form .form-label {
+    font-size: var(--text-xs);
+    margin-bottom: var(--space-1);
+}
+
+.seats-add-form .form-input {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+}
+
+/* --- Controls --- */
+.seats-controls__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.seats-controls__actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.seats-controls__secondary {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.seats-controls__secondary .btn {
+    flex: 1;
+}
+
+/* --- Student List --- */
+.seats-student-list-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+}
+
+.seats-student-list-card__header h3 {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+}
+
+.seats-student-list {
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.student-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    transition: all var(--transition-fast);
+}
+
+.student-item:hover {
+    background: var(--glass-bg-hover);
+}
+
+.student-item__roll {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    min-width: 28px;
+}
+
+.student-item__name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.student-item__height {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--accent-info);
+}
+
+.student-item__remove {
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.student-item__remove:hover {
+    color: var(--accent-danger);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* --- Grid Panel --- */
+.seats-grid-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* --- Teacher Desk --- */
+.teacher-desk {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--text-secondary);
+    text-align: center;
+    border: 2px dashed var(--glass-border);
+    background: transparent;
+    box-shadow: none;
+}
+
+/* --- Classroom Grid --- */
+.classroom-grid {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.classroom-grid__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    color: var(--text-muted);
+    text-align: center;
+    padding: var(--space-8);
+}
+
+.classroom-grid__empty p {
+    font-size: var(--text-sm);
+    max-width: 300px;
+}
+
+.classroom-grid__table {
+    width: 100%;
+    display: grid;
+    gap: var(--space-2);
+}
+
+/* --- Seat Cell --- */
+.seat-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: var(--space-2) var(--space-1);
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    min-height: 52px;
+    transition: all var(--transition-base);
+    position: relative;
+    cursor: default;
+}
+
+.seat-cell:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--glass-border-hover);
+    transform: scale(1.05);
+    z-index: 2;
+}
+
+.seat-cell--empty {
+    background: transparent;
+    border-style: dashed;
+    opacity: 0.4;
+}
+
+.seat-cell__name {
+    font-size: 10px;
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    line-height: 1.2;
+}
+
+.seat-cell__roll {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    line-height: 1;
+}
+
+.seat-cell__height-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    opacity: 0.7;
+}
+
+.seat-cell__height-bar--short { background: var(--accent-secondary); }
+.seat-cell__height-bar--avg { background: var(--accent-info); }
+.seat-cell__height-bar--tall { background: var(--accent-warning); }
+
+/* --- Row Labels --- */
+.grid-row-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xs);
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    padding: var(--space-1);
+}
+
+/* --- Height Legend --- */
+.height-legend {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-3) var(--space-4);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.height-legend__title {
+    font-weight: var(--weight-semibold);
+    color: var(--text-secondary);
+}
+
+.height-legend__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.height-legend__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+    .seats-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .seats-panel {
+        order: 2;
+    }
+
+    .seats-grid-panel {
+        order: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .seats-add-form__row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .seats-add-form__row .form-group:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .classroom-grid {
+        padding: var(--space-3);
+        overflow-x: auto;
+    }
+
+    .seat-cell {
+        min-height: 44px;
+        padding: var(--space-1);
+    }
+
+    .seat-cell__name {
+        font-size: 9px;
+    }
+
+    .seat-cell__roll {
+        font-size: 8px;
+    }
+
+    .height-legend {
+        flex-wrap: wrap;
+        gap: var(--space-3);
+    }
+}
+
+@media (max-width: 480px) {
+    .seats-controls__row {
+        grid-template-columns: 1fr;
+    }
+}
