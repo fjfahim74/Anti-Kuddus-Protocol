@@ -12,6 +12,13 @@ const ComplaintModule = (function () {
 
     const SEVERITY_LABELS = ['', 'Low', 'Medium', 'High', 'Critical'];
 
+    const ROLE_LABELS = {
+        student: 'Student',
+        captain_1: 'Class Captain 1',
+        captain_2: 'Class Captain 2',
+        captain_3: 'Class Captain 3'
+    };
+
     let currentFilter = 'all';
 
     function init() {
@@ -88,6 +95,8 @@ const ComplaintModule = (function () {
         var message = document.getElementById('complaint-message').value.trim();
         var severity = parseInt(document.querySelector('input[name="severity"]:checked').value, 10);
         var target = document.getElementById('complaint-target').value;
+        var targetName = document.getElementById('complaint-target-name').value.trim();
+        var targetRole = document.getElementById('complaint-target-role').value;
         var anonymous = document.getElementById('anonymous-check').checked;
         var session = App.getSession();
 
@@ -114,6 +123,8 @@ const ComplaintModule = (function () {
             message: message,
             severity: severity,
             targetRoll: target ? parseInt(target, 10) : null,
+            targetName: targetName || null,
+            targetRole: targetRole || null,
             anonymous: anonymous,
             submittedBy: session ? session.rollNumber : null,
             submitterName: session ? session.name : 'Unknown',
@@ -131,6 +142,8 @@ const ComplaintModule = (function () {
         document.getElementById('complaint-form').reset();
         document.getElementById('char-count').textContent = '0';
         document.getElementById('anonymous-check').checked = true;
+        document.getElementById('complaint-target-name').value = '';
+        document.getElementById('complaint-target-role').value = '';
 
         updateCount();
         renderComplaints();
@@ -207,6 +220,12 @@ const ComplaintModule = (function () {
                 : '<span class="badge badge--warning">Pending</span>';
             var author = c.anonymous ? 'Anonymous' : ('Roll #' + c.submittedBy);
 
+            var targetParts = [];
+            if (c.targetRoll) targetParts.push('Roll #' + c.targetRoll);
+            if (c.targetName) targetParts.push(UI.escapeHTML(c.targetName));
+            if (c.targetRole) targetParts.push(ROLE_LABELS[c.targetRole] || c.targetRole);
+            var targetLabel = targetParts.length ? (' → ' + targetParts.join(' · ')) : '';
+
             html +=
                 '<div class="complaint-card glass-card glass-card--static animate-in">' +
                     '<div class="complaint-card__header">' +
@@ -221,7 +240,7 @@ const ComplaintModule = (function () {
                         '<span class="complaint-card__author">' +
                             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>' +
                             author +
-                            (c.targetRoll ? ' → Roll #' + c.targetRoll : '') +
+                            targetLabel +
                         '</span>' +
                         '<span class="complaint-card__status">' + statusBadge + '</span>' +
                     '</div>' +

@@ -1,174 +1,143 @@
 const Auth = (function () {
     function init() {
-        // Guard: if already logged in, redirect to Dashboard
-        var session = Storage.get('session');
-        if (session && session.isLoggedIn) {
-            window.location.href = 'dashboard.html';
-            return;
-        }
+        const form = document.getElementById('login-form');
+        if (!form) return;
 
-        var instSetupCard = document.getElementById('inst-setup-card');
-        var signinCard = document.getElementById('signin-card');
+        form.addEventListener('submit', handleLogin);
 
-        if (instSetupCard) instSetupCard.classList.add('hidden');
-        if (signinCard) signinCard.classList.remove('hidden');
+        const rollInput = document.getElementById('roll-number');
+        const passwordInput = document.getElementById('password');
 
-        var loginForm = document.getElementById('login-form');
-        if (loginForm) loginForm.addEventListener('submit', handleSignIn);
+        if (rollInput) rollInput.addEventListener('input', () => clearError('roll'));
+        if (passwordInput) passwordInput.addEventListener('input', () => clearError('password'));
 
-        var rollInput = document.getElementById('roll-number');
-        var passInput = document.getElementById('password');
-
-        if (rollInput) rollInput.addEventListener('input', function () { clearFieldError('roll'); hideGlobalError(); });
-        if (passInput) passInput.addEventListener('input', function () { clearFieldError('password'); hideGlobalError(); });
-
-        var clearDataBtn = document.getElementById('clear-data-btn');
+        const clearDataBtn = document.getElementById('clear-data-btn');
         if (clearDataBtn) clearDataBtn.addEventListener('click', handleClearData);
-
-        populateFromConfig();
     }
 
-    function populateFromConfig() {
-        var config = Storage.get('config');
-        var subtitle = document.getElementById('login-subtitle');
-        if (subtitle) {
-            if (config && config.schoolName) {
-                var cls = config.class || (config.className ? config.className.split(' ')[0] : '');
-                var sec = config.section || (config.className ? config.className.split(' ').slice(1).join(' ') : '');
-                subtitle.textContent = config.schoolName + ' — ' + cls + ' ' + sec;
-            } else {
-                subtitle.textContent = 'Welcome back to Anti-Kuddus Protocol';
-            }
-        }
-
-        var rollInput = document.getElementById('roll-number');
-        if (rollInput) {
-            rollInput.placeholder = 'Enter your roll number';
-        }
-    }
-
-    function handleSignIn(e) {
+    function handleLogin(e) {
         e.preventDefault();
 
-        var rollInput = document.getElementById('roll-number');
-        var passInput = document.getElementById('password');
-        var loginBtn = document.getElementById('login-btn');
+        const rollInput = document.getElementById('roll-number');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('login-btn');
 
-        var rollNumber = parseInt(rollInput.value, 10);
-        var password = passInput.value;
+        const rollNumber = parseInt(rollInput.value, 10);
+        const password = passwordInput.value;
 
-        var hasError = false;
+        let hasError = false;
 
-        if (isNaN(rollNumber) || rollInput.value.trim() === "") {
-            showFieldError('roll', 'Roll Number is required');
+        const rollError = Utils.validateRequired(rollInput.value, 'Roll number');
+        if (rollError) {
+            showError('roll', rollError);
             hasError = true;
         }
 
-        if (!password) {
-            showFieldError('password', 'Password is required');
+        const passwordError = Utils.validateRequired(password, 'Password');
+        if (passwordError) {
+            showError('password', passwordError);
             hasError = true;
         }
 
         if (hasError) {
-            shakeCard('#signin-card');
+            shakeCard();
             return;
         }
 
-        var users = Storage.get('users') || [];
-        var user = users.find(function (u) { return u.rollNumber === rollNumber; });
+        const account = Storage.get('account');
 
-        if (!user) {
-            showGlobalError('No account found with Roll #' + rollNumber + '. Please sign up first.');
-            shakeCard('#signin-card');
+        if (!account) {
+            showError('roll', "No account found on this device. Please sign up first.");
+            shakeCard();
             return;
         }
 
-        if (user.password !== password) {
-            showGlobalError('Incorrect password. Please try again.');
-            shakeCard('#signin-card');
+        if (account.rollNumber !== rollNumber) {
+            showError('roll', 'No account found with that roll number.');
+            shakeCard();
+            return;
+        }
+
+        if (account.password !== password) {
+            showError('password', 'Incorrect password.');
+            shakeCard();
             return;
         }
 
         UI.setLoading(loginBtn, true);
 
-        setTimeout(function () {
-            var session = {
-                rollNumber: user.rollNumber,
-                name: user.name,
-                role: user.role,
+        setTimeout(() => {
+            const session = {
+                rollNumber: account.rollNumber,
+                name: account.name,
+                role: account.role,
+                captainLevel: account.captainLevel || null,
                 isLoggedIn: true,
                 loginTime: new Date().toISOString()
             };
 
             Storage.set('session', session);
-            UI.toast('Welcome back, ' + user.name + '!', 'success');
+            UI.toast('Welcome back, ' + account.name + '!', 'success');
 
-            setTimeout(function () {
+            setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 500);
-        }, 600);
+        }, 500);
     }
 
     function handleClearData() {
-        UI.confirm('Are you sure you want to clear all platform data? This will permanently delete all users, complaints, rules, seat plans, and your active session.', function () {
+        UI.confirm('This will erase all data saved on this device (your account, complaints, everything). You will need to sign up again. Continue?', () => {
             Storage.clear();
-            localStorage.clear();
-            UI.toast('All platform data cleared!', 'success');
-            setTimeout(function () {
-                window.location.reload();
-            }, 800);
+            UI.modal({
+                title: 'Data Cleared',
+                content: '<p>All local data has been cleared. You can sign up again whenever you\'re ready.</p>',
+                confirmText: 'OK',
+                showCancel: false
+            });
+
+            const form = document.getElementById('login-form');
+            if (form) form.reset();
         });
     }
 
-    function showFieldError(field, message) {
-        var errorEl = document.getElementById(field + '-error');
-        var inputIdMap = {
-            'roll': 'roll-number',
-            'password': 'password',
-            'setup-school': 'setup-school-name',
-            'setup-class': 'setup-class-name',
-            'setup-section': 'setup-section-name'
-        };
-        var inputEl = document.getElementById(inputIdMap[field]);
-
-        if (errorEl) { errorEl.textContent = message; errorEl.classList.remove('hidden'); }
-        if (inputEl) { inputEl.classList.add('form-input--error'); }
+    function shakeCard() {
+        const card = document.querySelector('.login-card');
+        if (!card) return;
+        card.classList.add('shake');
+        card.addEventListener('animationend', () => card.classList.remove('shake'), { once: true });
     }
 
-    function clearFieldError(field) {
-        var errorEl = document.getElementById(field + '-error');
-        var inputIdMap = {
-            'roll': 'roll-number',
-            'password': 'password',
-            'setup-school': 'setup-school-name',
-            'setup-class': 'setup-class-name',
-            'setup-section': 'setup-section-name'
-        };
-        var inputEl = document.getElementById(inputIdMap[field]);
+    function showError(field, message) {
+        const errorEl = document.getElementById(field + '-error');
+        const inputEl = document.getElementById(field === 'roll' ? 'roll-number' : field);
 
-        if (errorEl) { errorEl.textContent = ''; errorEl.classList.add('hidden'); }
-        if (inputEl) { inputEl.classList.remove('form-input--error'); }
+        if (errorEl) {
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+        }
+
+        if (inputEl) {
+            inputEl.classList.add('form-input--error');
+        }
     }
 
-    function showGlobalError(message) {
-        var el = document.getElementById('login-error');
-        if (el) { el.textContent = message; el.classList.remove('hidden'); el.style.display = 'block'; }
-    }
+    function clearError(field) {
+        const errorEl = document.getElementById(field + '-error');
+        const inputEl = document.getElementById(field === 'roll' ? 'roll-number' : field);
 
-    function hideGlobalError() {
-        var el = document.getElementById('login-error');
-        if (el) { el.textContent = ''; el.classList.add('hidden'); el.style.display = 'none'; }
-    }
+        if (errorEl) {
+            errorEl.textContent = '';
+            errorEl.classList.add('hidden');
+        }
 
-    function shakeCard(selector) {
-        var card = document.querySelector(selector || '.login-card');
-        if (card) {
-            card.classList.add('shake');
-            card.addEventListener('animationend', function () { card.classList.remove('shake'); }, { once: true });
+        if (inputEl) {
+            inputEl.classList.remove('form-input--error');
         }
     }
 
     document.addEventListener('DOMContentLoaded', init);
 
-    return {};
+    return {
+        handleLogin
+    };
 })();

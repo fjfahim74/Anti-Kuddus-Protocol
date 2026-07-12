@@ -39,23 +39,18 @@
 .modules-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-6);
+    gap: var(--space-5);
 }
 
 .module-card {
     display: flex;
     align-items: center;
     gap: var(--space-5);
-    padding: var(--space-6) var(--space-5);
+    padding: var(--space-6);
     text-decoration: none;
     color: inherit;
     position: relative;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.015);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-base);
 }
 
 .module-card::before {
@@ -63,58 +58,61 @@
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity var(--transition-slow);
+    transition: opacity var(--transition-base);
     pointer-events: none;
     border-radius: inherit;
-    z-index: 0;
 }
 
-.module-card[data-module="complaint"]::before { background: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.06), transparent 75%); }
-.module-card[data-module="seats"]::before { background: radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.06), transparent 75%); }
-.module-card[data-module="study"]::before { background: radial-gradient(circle at 15% 50%, rgba(6, 182, 212, 0.06), transparent 75%); }
-.module-card[data-module="corruption"]::before { background: radial-gradient(circle at 15% 50%, rgba(245, 158, 11, 0.06), transparent 75%); }
-.module-card[data-module="sos"]::before { background: radial-gradient(circle at 15% 50%, rgba(239, 68, 68, 0.06), transparent 75%); }
-.module-card[data-module="rules"]::before { background: radial-gradient(circle at 15% 50%, rgba(34, 197, 94, 0.06), transparent 75%); }
-
-.module-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: var(--shadow-md);
-}
+.module-card[data-module="complaint"]::before { background: radial-gradient(circle at 20% 50%, rgba(108, 99, 255, 0.06), transparent 70%); }
+.module-card[data-module="seats"]::before { background: radial-gradient(circle at 20% 50%, rgba(0, 212, 170, 0.06), transparent 70%); }
+.module-card[data-module="study"]::before { background: radial-gradient(circle at 20% 50%, rgba(56, 189, 248, 0.06), transparent 70%); }
+.module-card[data-module="corruption"]::before { background: radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.06), transparent 70%); }
+.module-card[data-module="sos"]::before { background: radial-gradient(circle at 20% 50%, rgba(239, 68, 68, 0.06), transparent 70%); }
+.module-card[data-module="rules"]::before { background: radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.06), transparent 70%); }
 
 .module-card:hover::before {
     opacity: 1;
 }
 
-.module-card > * {
-    position: relative;
-    z-index: 1;
-}
-
 .module-card__icon {
-    width: 48px;
-    height: 48px;
+    width: 52px;
+    height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-md);
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all var(--transition-base);
 }
 
-.module-card:hover .module-card__icon {
-    transform: scale(1.05);
-    border-color: rgba(255, 255, 255, 0.12);
+.module-card__icon--purple {
+    background: rgba(108, 99, 255, 0.12);
+    color: var(--accent-primary);
 }
 
-.module-card__icon--purple { color: var(--accent-primary-hover); background: rgba(139, 92, 246, 0.08); }
-.module-card__icon--teal { color: var(--accent-secondary-hover); background: rgba(16, 185, 129, 0.08); }
-.module-card__icon--blue { color: var(--accent-info); background: rgba(6, 182, 212, 0.08); }
-.module-card__icon--amber { color: var(--accent-warning); background: rgba(245, 158, 11, 0.08); }
-.module-card__icon--red { color: var(--accent-danger-hover); background: rgba(239, 68, 68, 0.08); }
-.module-card__icon--green { color: #34d399; background: rgba(34, 197, 94, 0.08); }
+.module-card__icon--teal {
+    background: rgba(0, 212, 170, 0.12);
+    color: var(--accent-secondary);
+}
+
+.module-card__icon--blue {
+    background: rgba(56, 189, 248, 0.12);
+    color: var(--accent-info);
+}
+
+.module-card__icon--amber {
+    background: rgba(251, 191, 36, 0.12);
+    color: var(--accent-warning);
+}
+
+.module-card__icon--red {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--accent-danger);
+}
+
+.module-card__icon--green {
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+}
 
 .module-card__content {
     flex: 1;
@@ -123,9 +121,8 @@
 
 .module-card__title {
     font-size: var(--text-base);
-    font-weight: var(--weight-bold);
+    font-weight: var(--weight-semibold);
     margin-bottom: var(--space-1);
-    letter-spacing: -0.01em;
 }
 
 .module-card__desc {
@@ -141,7 +138,7 @@
 }
 
 .module-card:hover .module-card__arrow {
-    color: var(--accent-primary-hover);
+    color: var(--accent-primary);
     transform: translateX(4px);
 }
 
@@ -184,7 +181,7 @@
     flex-shrink: 0;
 }
 
-.activity-item__icon--purple { background: rgba(var(--accent-primary-rgb), 0.1); }
+.activity-item__icon--purple { background: rgba(108, 99, 255, 0.1); }
 .activity-item__icon--red { background: rgba(239, 68, 68, 0.1); }
 .activity-item__icon--amber { background: rgba(251, 191, 36, 0.1); }
 .activity-item__icon--teal { background: rgba(0, 212, 170, 0.1); }
@@ -244,7 +241,7 @@
 
 .mood-emoji--selected {
     border-color: var(--accent-primary);
-    background: rgba(var(--accent-primary-rgb), 0.08);
+    background: rgba(108, 99, 255, 0.08);
     pointer-events: none;
 }
 

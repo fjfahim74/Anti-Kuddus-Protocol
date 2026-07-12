@@ -9,35 +9,101 @@ const App = (function () {
         'rules.html'
     ];
 
-    const SETUP_REQUIRED_PAGES = [
-        'dashboard.html',
-        'complaint.html',
-        'seats.html',
-        'study.html',
-        'corruption.html',
-        'sos.html',
-        'rules.html'
-    ];
-
     function init() {
-        checkSetup();
+        applyTheme();
         checkAuth();
         initNavbar();
         initSeedData();
+        initSoundEffects();
     }
 
-    function checkSetup() {
+    // --- Theme ---
+    function applyTheme(theme) {
         const config = getConfig();
-        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        const resolved = theme || (config && config.theme) || 'dark';
+        document.documentElement.setAttribute('data-theme', resolved);
+    }
 
-        const needsSetup = SETUP_REQUIRED_PAGES.some(
-            (p) => currentPage === p || currentPage.endsWith('/' + p)
-        );
+    function setTheme(theme) {
+        const config = getConfig() || {};
+        config.theme = theme;
+        Storage.set('config', config);
+        applyTheme(theme);
+    }
 
-        if (needsSetup && (!config || !config.setupComplete)) {
-            Utils.navigate('setup.html');
-            return;
+    // --- Sound Effects ---
+    let audioCtx = null;
+
+    function isSoundEnabled() {
+        const config = getConfig();
+        return !config || config.soundEnabled !== false;
+    }
+
+    function setSoundEnabled(enabled) {
+        const config = getConfig() || {};
+        config.soundEnabled = enabled;
+        Storage.set('config', config);
+    }
+
+    function ensureAudioCtx() {
+        if (audioCtx) return audioCtx;
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return null;
+        audioCtx = new AudioContextClass();
+        return audioCtx;
+    }
+
+    function playClickSound() {
+        if (!isSoundEnabled()) return;
+        try {
+            const ctx = ensureAudioCtx();
+            if (!ctx) return;
+
+            const fire = () => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(720, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(420, ctx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.09);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                osc.stop(ctx.currentTime + 0.1);
+            };
+
+            // AudioContext.resume() is asynchronous — the sound must be
+            // scheduled only after the context has actually resumed,
+            // otherwise it gets silently dropped while suspended.
+            if (ctx.state === 'suspended') {
+                ctx.resume().then(fire).catch(() => {});
+            } else {
+                fire();
+            }
+        } catch (e) {
+            // Audio not available — fail silently
         }
+    }
+
+    function initSoundEffects() {
+        // Unlock/create the AudioContext on the very first user gesture so
+        // it's already running (not "suspended") by the time a click needs it.
+        const unlock = () => {
+            ensureAudioCtx();
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+            document.removeEventListener('pointerdown', unlock, true);
+        };
+        document.addEventListener('pointerdown', unlock, true);
+
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('button, .btn, a.btn, .chip--clickable, .tab, .tabs__btn, .role-option label, .severity-option, [role="button"]');
+            if (target) playClickSound();
+        }, true);
     }
 
     function checkAuth() {
@@ -92,15 +158,19 @@ const App = (function () {
         return config ? config.studentCount : 60;
     }
 
-    function getCaptainName() {
+    function getCaptainName(level) {
         const config = getConfig();
-        return config ? config.captainName : 'Captain';
+        if (!config) return 'Captain';
+        if (level === 2) return config.captain2Name || '2nd Captain';
+        if (level === 3) return config.captain3Name || '3rd Captain';
+        return config.captain1Name || config.captainName || 'Captain';
     }
 
     function getDisplayName() {
         const config = getConfig();
         if (!config) return 'Classroom Governance Platform';
-        return config.schoolName + ' — Class ' + config.className;
+        const classLabel = config.section ? config.className + '-' + config.section : config.className;
+        return config.schoolName + ' — Class ' + classLabel;
     }
 
     function logout() {
@@ -110,7 +180,7 @@ const App = (function () {
 
     function resetSetup() {
         Storage.clear();
-        Utils.navigate('setup.html');
+        Utils.navigate('index.html');
     }
 
     function initNavbar() {
@@ -127,17 +197,196 @@ const App = (function () {
 
             if (avatar) avatar.textContent = Utils.getInitials(session.name);
             if (nameEl) nameEl.textContent = session.name;
+
+            userEl.addEventListener('click', () => openProfileModal());
+            userEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openProfileModal();
+                }
+            });
         }
 
         const logoutBtn = navbar.querySelector('.navbar__logout');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                UI.confirm('Are you sure you want to logout?', () => {
+                UI.confirm('Are you sure you want to sign out?', () => {
                     logout();
                 });
             });
         }
+    }
+
+    // --- Profile / Settings Modal ---
+    const ROLE_OPTIONS = [
+        { value: 'student', label: 'Student' },
+        { value: 'captain', label: 'Captain' }
+    ];
+
+    function openProfileModal() {
+        const session = getSession();
+        const config = getConfig();
+        if (!session) return;
+
+        const roleOptionsHTML = ROLE_OPTIONS.map((r) =>
+            `<option value="${r.value}" ${session.role === r.value ? 'selected' : ''}>${r.label}</option>`
+        ).join('');
+
+        const content = `
+            <div class="profile-modal">
+                <div class="profile-modal__tabs">
+                    <button type="button" class="profile-modal__tab profile-modal__tab--active" data-ptab="profile">Profile</button>
+                    <button type="button" class="profile-modal__tab" data-ptab="settings">Settings</button>
+                </div>
+
+                <div class="profile-modal__panel" data-ppanel="profile">
+                    <div class="profile-modal__avatar">
+                        <div class="profile-modal__avatar-circle">${Utils.getInitials(session.name)}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="profile-name">Your Name</label>
+                        <input type="text" id="profile-name" class="form-input" value="${UI.escapeHTML(session.name || '')}">
+                    </div>
+                    <div class="setup-row" style="display:grid; grid-template-columns:1fr 1fr; gap: var(--space-4);">
+                        <div class="form-group">
+                            <label class="form-label" for="profile-roll">Roll Number</label>
+                            <input type="number" id="profile-roll" class="form-input" value="${session.rollNumber}" min="1" max="${config ? config.studentCount : 200}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="profile-role">Role</label>
+                            <select id="profile-role" class="form-input">${roleOptionsHTML}</select>
+                        </div>
+                    </div>
+                    <div class="form-group ${session.role === 'captain' ? '' : 'hidden'}" id="profile-captain-level-group">
+                        <label class="form-label" for="profile-captain-level">Which Captain?</label>
+                        <select id="profile-captain-level" class="form-input">
+                            <option value="1" ${session.captainLevel == 1 ? 'selected' : ''}>Captain 1</option>
+                            <option value="2" ${session.captainLevel == 2 ? 'selected' : ''}>Captain 2</option>
+                            <option value="3" ${session.captainLevel == 3 ? 'selected' : ''}>Captain 3</option>
+                        </select>
+                    </div>
+                    <p class="profile-modal__meta">${config ? UI.escapeHTML(config.schoolName + ' — Class ' + config.className + (config.section ? '-' + config.section : '')) : ''}</p>
+                    <span class="form-error hidden" id="profile-error"></span>
+                </div>
+
+                <div class="profile-modal__panel hidden" data-ppanel="settings">
+                    <div class="profile-modal__setting-row">
+                        <div>
+                            <strong>Touch Sound</strong>
+                            <p class="profile-modal__setting-desc">Play a subtle sound when tapping buttons</p>
+                        </div>
+                        <label class="toggle" for="settings-sound">
+                            <input type="checkbox" id="settings-sound" ${isSoundEnabled() ? 'checked' : ''}>
+                            <span class="toggle__slider"></span>
+                        </label>
+                    </div>
+                    <div class="profile-modal__setting-row">
+                        <div>
+                            <strong>Dark Mode</strong>
+                            <p class="profile-modal__setting-desc">Switch between dark and light appearance</p>
+                        </div>
+                        <label class="toggle" for="settings-theme">
+                            <input type="checkbox" id="settings-theme" ${(config ? config.theme : 'dark') === 'dark' ? 'checked' : ''}>
+                            <span class="toggle__slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const modalEl = UI.modal({
+            title: 'Profile & Settings',
+            content,
+            confirmText: 'Save Changes',
+            cancelText: 'Close',
+            onConfirm: () => saveProfileChanges()
+        });
+
+        // Tab switching
+        const tabs = modalEl.querySelectorAll('.profile-modal__tab');
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+                tabs.forEach((t) => t.classList.remove('profile-modal__tab--active'));
+                tab.classList.add('profile-modal__tab--active');
+                modalEl.querySelectorAll('.profile-modal__panel').forEach((p) => {
+                    p.classList.toggle('hidden', p.dataset.ppanel !== tab.dataset.ptab);
+                });
+            });
+        });
+
+        // Live-apply settings so the person can preview before saving
+        const soundToggle = modalEl.querySelector('#settings-sound');
+        const themeToggle = modalEl.querySelector('#settings-theme');
+
+        if (soundToggle) {
+            soundToggle.addEventListener('change', () => {
+                setSoundEnabled(soundToggle.checked);
+                if (soundToggle.checked) playClickSound();
+            });
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('change', () => {
+                setTheme(themeToggle.checked ? 'dark' : 'light');
+            });
+        }
+
+        // Show/hide captain level based on role selection
+        const roleSelect = modalEl.querySelector('#profile-role');
+        const captainLevelGroup = modalEl.querySelector('#profile-captain-level-group');
+        if (roleSelect && captainLevelGroup) {
+            roleSelect.addEventListener('change', () => {
+                captainLevelGroup.classList.toggle('hidden', roleSelect.value !== 'captain');
+            });
+        }
+    }
+
+    function saveProfileChanges() {
+        const session = getSession();
+        if (!session) return;
+
+        const nameInput = document.getElementById('profile-name');
+        const rollInput = document.getElementById('profile-roll');
+        const roleInput = document.getElementById('profile-role');
+        if (!nameInput || !rollInput || !roleInput) return;
+
+        const captainLevelInput = document.getElementById('profile-captain-level');
+        const name = nameInput.value.trim();
+        const rollNumber = parseInt(rollInput.value, 10);
+        const role = roleInput.value;
+        const captainLevel = role === 'captain' ? parseInt(captainLevelInput ? captainLevelInput.value : 1, 10) : null;
+        const config = getConfig();
+        const maxStudents = config ? config.studentCount : 200;
+
+        if (!name || name.length < 2) {
+            UI.toast('Name must be at least 2 characters', 'warning');
+            return;
+        }
+
+        if (isNaN(rollNumber) || rollNumber < 1 || rollNumber > maxStudents) {
+            UI.toast('Enter a valid roll number (1-' + maxStudents + ')', 'warning');
+            return;
+        }
+
+        session.name = name;
+        session.rollNumber = rollNumber;
+        session.role = role;
+        session.captainLevel = captainLevel;
+        Storage.set('session', session);
+
+        // Keep the persisted account record (used for future sign-ins) in sync
+        const account = Storage.get('account');
+        if (account) {
+            account.name = name;
+            account.rollNumber = rollNumber;
+            account.role = role;
+            account.captainLevel = captainLevel;
+            Storage.set('account', account);
+        }
+
+        initNavbar();
+        UI.toast('Profile updated!', 'success');
     }
 
     function initSeedData() {
@@ -167,28 +416,13 @@ const App = (function () {
     }
 
     function getNavbarHTML(options = {}) {
-        const { backLink = 'index.html', title = 'AKP' } = options;
+        const { backLink = 'dashboard.html', title = 'AKP' } = options;
         const base = Utils.getBasePath();
-        const displayTitle = title === 'AKP' 
-            ? `<span class="logo-brand">A<span class="logo-brand-accent">K</span>P</span>` 
-            : `<span class="logo-brand">${title}</span>`;
-            
         return `
         <nav class="navbar" role="navigation" aria-label="Main navigation">
-            <a href="${base}${backLink}" class="navbar__logo" aria-label="Anti-Kuddus Protocol Home">
-                <div class="navbar__logo-icon">
-                    <svg class="logo-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logo-grad-dyn" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#6366f1" />
-                                <stop offset="100%" stop-color="#06b6d4" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M16 2L28 8V20L16 30L4 20V8L16 2Z" class="logo-icon-shield" stroke="url(#logo-grad-dyn)" stroke-width="2" stroke-linejoin="round" fill="rgba(99, 102, 241, 0.05)" />
-                        <path d="M17 7L10 15H16L15 25L22 14H16L17 7Z" class="logo-icon-lightning" fill="url(#logo-grad-dyn)" />
-                    </svg>
-                </div>
-                ${displayTitle}
+            <a href="${base}${backLink}" class="navbar__logo" aria-label="Go to dashboard">
+                <div class="navbar__logo-icon"><svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5L4.5 5.5V11C4.5 15.8 7.6 20.2 12 21.5C16.4 20.2 19.5 15.8 19.5 11V5.5L12 2.5Z" fill="white"/><path d="M8.5 12L10.8 14.3L15.5 9.2" stroke="#6c63ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+                <span>${title}</span>
             </a>
             <div class="navbar__actions">
                 <div class="navbar__user">
@@ -232,7 +466,13 @@ const App = (function () {
         logout,
         resetSetup,
         getNavbarHTML,
-        getPageHeaderHTML
+        getPageHeaderHTML,
+        applyTheme,
+        setTheme,
+        isSoundEnabled,
+        setSoundEnabled,
+        playClickSound,
+        openProfileModal
     };
 })();
 

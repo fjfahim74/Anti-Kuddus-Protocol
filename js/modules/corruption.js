@@ -21,6 +21,12 @@ const CorruptionModule = (function () {
         other: 'primary'
     };
 
+    var EVIDENCE_TYPE_LABELS = {
+        witness: 'Witness',
+        proof: 'Proof',
+        witness_proof: 'Witness & Proof'
+    };
+
     function init() {
         initTabs();
         initForm();
@@ -47,6 +53,10 @@ const CorruptionModule = (function () {
         });
     }
 
+    var selectedProofFiles = [];
+    var MAX_PROOF_FILES = 4;
+    var MAX_STORED_FILE_BYTES = 1.5 * 1024 * 1024; // ~1.5MB per file, kept safe for localStorage
+
     function initForm() {
         var form = document.getElementById('corruption-form');
         var textarea = document.getElementById('corruption-item');
@@ -64,12 +74,108 @@ const CorruptionModule = (function () {
             });
         }
 
+        initEvidenceFields();
+
         if (form) {
             form.addEventListener('submit', function (e) {
                 e.preventDefault();
                 handleSubmit();
             });
         }
+    }
+
+    function initEvidenceFields() {
+        var typeSelect = document.getElementById('corruption-evidence-type');
+        var witnessGroup = document.getElementById('evidence-witness-group');
+        var proofGroup = document.getElementById('evidence-proof-group');
+        var fileInput = document.getElementById('evidence-proof-file');
+
+        if (!typeSelect) return;
+
+        typeSelect.addEventListener('change', function () {
+            var val = typeSelect.value;
+            var showWitness = val === 'witness' || val === 'witness_proof';
+            var showProof = val === 'proof' || val === 'witness_proof';
+
+            witnessGroup.classList.toggle('hidden', !showWitness);
+            proofGroup.classList.toggle('hidden', !showProof);
+
+            if (!showWitness) {
+                document.getElementById('evidence-witness-name').value = '';
+                document.getElementById('evidence-witness-roll').value = '';
+            }
+            if (!showProof) {
+                selectedProofFiles = [];
+                fileInput.value = '';
+                renderFileList();
+            }
+        });
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function () {
+                var incoming = Array.prototype.slice.call(fileInput.files);
+                incoming.forEach(function (file) {
+                    if (selectedProofFiles.length >= MAX_PROOF_FILES) return;
+                    selectedProofFiles.push(file);
+                });
+                fileInput.value = '';
+                if (incoming.length && selectedProofFiles.length >= MAX_PROOF_FILES) {
+                    UI.toast('Up to ' + MAX_PROOF_FILES + ' files can be attached', 'info', 2500);
+                }
+                renderFileList();
+            });
+        }
+    }
+
+    function renderFileList() {
+        var listEl = document.getElementById('evidence-file-list');
+        var btnText = document.getElementById('evidence-file-btn-text');
+        if (!listEl) return;
+
+        if (btnText) {
+            btnText.textContent = selectedProofFiles.length
+                ? selectedProofFiles.length + ' file' + (selectedProofFiles.length !== 1 ? 's' : '') + ' selected — add more'
+                : 'Choose images, screenshots or short videos';
+        }
+
+        if (selectedProofFiles.length === 0) {
+            listEl.innerHTML = '';
+            return;
+        }
+
+        var html = '';
+        selectedProofFiles.forEach(function (file, i) {
+            html +=
+                '<div class="evidence-file-item">' +
+                    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+                    '<span class="evidence-file-item__name">' + UI.escapeHTML(file.name) + '</span>' +
+                    '<button type="button" class="evidence-file-item__remove" data-index="' + i + '" aria-label="Remove file">' +
+                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+                    '</button>' +
+                '</div>';
+        });
+
+        listEl.innerHTML = html;
+
+        listEl.querySelectorAll('.evidence-file-item__remove').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                selectedProofFiles.splice(parseInt(btn.dataset.index, 10), 1);
+                renderFileList();
+            });
+        });
+    }
+
+    function readFileAsDataURL(file) {
+        return new Promise(function (resolve) {
+            if (file.size > MAX_STORED_FILE_BYTES) {
+                resolve(null);
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function () { resolve(reader.result); };
+            reader.onerror = function () { resolve(null); };
+            reader.readAsDataURL(file);
+        });
     }
 
     function initFilters() {
@@ -102,7 +208,9 @@ const CorruptionModule = (function () {
         var accused = document.getElementById('corruption-accused').value.trim();
         var category = document.getElementById('corruption-category').value;
         var date = document.getElementById('corruption-date').value;
-        var evidence = document.getElementById('corruption-evidence').value.trim();
+        var evidenceType = document.getElementById('corruption-evidence-type').value;
+        var witnessName = document.getElementById('evidence-witness-name').value.trim();
+        var witnessRoll = document.getElementById('evidence-witness-roll').value.trim();
 
         var config = App.getConfig();
         var maxStudents = config ? config.studentCount : 60;
@@ -124,26 +232,63 @@ const CorruptionModule = (function () {
             hasError = true;
         }
 
+        var needsWitness = evidenceType === 'witness' || evidenceType === 'witness_proof';
+        var needsProof = evidenceType === 'proof' || evidenceType === 'witness_proof';
+
+        if (needsWitness && (!witnessName || !witnessRoll)) {
+            showFormError('witness', 'Enter both the witness\'s name and roll number');
+            hasError = true;
+        }
+
+        if (needsProof && selectedProofFiles.length === 0) {
+            showFormError('proof', 'Attach at least one file as proof');
+            hasError = true;
+        }
+
         if (hasError) return;
 
-        var entry = {
-            id: Utils.generateId('cor'),
-            item: item,
-            accused: accusedNum,
-            category: category,
-            date: date || new Date().toISOString().split('T')[0],
-            evidence: evidence || null,
-            reportedBy: App.getSession().rollNumber,
-            timestamp: new Date().toISOString()
-        };
+        var submitBtn = document.getElementById('corruption-submit-btn');
+        UI.setLoading(submitBtn, true);
 
-        Storage.push('corruption', entry);
+        var filesToProcess = needsProof ? selectedProofFiles.slice() : [];
 
-        document.getElementById('corruption-form').reset();
-        document.getElementById('item-char-count').textContent = '0';
+        Promise.all(filesToProcess.map(function (file) {
+            return readFileAsDataURL(file).then(function (dataUrl) {
+                return {
+                    name: file.name,
+                    type: file.type,
+                    size: file.size,
+                    dataUrl: dataUrl
+                };
+            });
+        })).then(function (proofFiles) {
+            var entry = {
+                id: Utils.generateId('cor'),
+                item: item,
+                accused: accusedNum,
+                category: category,
+                date: date || new Date().toISOString().split('T')[0],
+                evidenceType: evidenceType || null,
+                witnessName: needsWitness ? witnessName : null,
+                witnessRoll: needsWitness ? parseInt(witnessRoll, 10) : null,
+                proofFiles: needsProof ? proofFiles : [],
+                reportedBy: App.getSession().rollNumber,
+                timestamp: new Date().toISOString()
+            };
 
-        renderStats();
-        UI.toast('Entry logged successfully!', 'success');
+            Storage.push('corruption', entry);
+
+            document.getElementById('corruption-form').reset();
+            document.getElementById('item-char-count').textContent = '0';
+            document.getElementById('evidence-witness-group').classList.add('hidden');
+            document.getElementById('evidence-proof-group').classList.add('hidden');
+            selectedProofFiles = [];
+            renderFileList();
+
+            UI.setLoading(submitBtn, false);
+            renderStats();
+            UI.toast('Entry logged successfully!', 'success');
+        });
     }
 
     function showFormError(field, message) {
@@ -253,16 +398,17 @@ const CorruptionModule = (function () {
                             '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>' +
                             entry.date +
                         '</span>' +
-                        (entry.evidence ?
+                        (entry.evidenceType ?
                             '<span class="record-card__meta-item">' +
                                 '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>' +
-                                UI.escapeHTML(entry.evidence) +
+                                EVIDENCE_TYPE_LABELS[entry.evidenceType] +
                             '</span>' : '') +
                         '<span class="record-card__meta-item">' +
                             '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>' +
                             Utils.timeAgo(entry.timestamp) +
                         '</span>' +
                     '</div>' +
+                    renderEvidenceDetail(entry) +
                 '</div>';
         });
 
@@ -280,6 +426,43 @@ const CorruptionModule = (function () {
                 });
             });
         });
+    }
+
+    function renderEvidenceDetail(entry) {
+        var hasWitness = entry.witnessName || entry.witnessRoll;
+        var hasProof = entry.proofFiles && entry.proofFiles.length > 0;
+
+        if (!hasWitness && !hasProof) return '';
+
+        var html = '<div class="record-card__evidence">';
+
+        if (hasWitness) {
+            html +=
+                '<div class="record-card__meta-item">' +
+                    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>' +
+                    'Witness: ' + UI.escapeHTML(entry.witnessName || 'Unknown') +
+                    (entry.witnessRoll ? ' (Roll #' + entry.witnessRoll + ')' : '') +
+                '</div>';
+        }
+
+        if (hasProof) {
+            html += '<div class="record-card__evidence-thumbs">';
+            entry.proofFiles.forEach(function (file) {
+                if (file.dataUrl && file.type && file.type.indexOf('image/') === 0) {
+                    html += '<img class="record-card__evidence-thumb" src="' + file.dataUrl + '" alt="' + UI.escapeHTML(file.name) + '" title="' + UI.escapeHTML(file.name) + '">';
+                } else {
+                    html +=
+                        '<span class="record-card__evidence-file" title="' + UI.escapeHTML(file.name) + (file.dataUrl ? '' : ' (too large to preview, filename saved only)') + '">' +
+                            '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>' +
+                            UI.escapeHTML(Utils.truncate(file.name, 18)) +
+                        '</span>';
+                }
+            });
+            html += '</div>';
+        }
+
+        html += '</div>';
+        return html;
     }
 
     function renderCharts() {

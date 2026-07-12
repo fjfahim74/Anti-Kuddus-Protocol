@@ -94,24 +94,27 @@ const Utils = (function () {
             .slice(0, 2);
     }
 
-    function getRoleName(role) {
-        const roles = {
-            student: 'Student',
-            captain: 'Captain',
-            captain_2nd: '2nd Captain',
-            captain_3rd: '3rd Captain',
-            cr: 'Class Representative',
-            teacher: 'Teacher'
-        };
-        return roles[role] || 'Student';
+    function getRoleName(role, captainLevel) {
+        if (role === 'captain') {
+            const ordinals = { 1: '1st', 2: '2nd', 3: '3rd' };
+            const prefix = ordinals[captainLevel] || '';
+            return (prefix ? prefix + ' ' : '') + 'Captain';
+        }
+        return 'Student';
     }
 
     function isCaptain(role) {
-        return role === 'captain' || role === 'captain_2nd' || role === 'captain_3rd';
+        return role === 'captain';
     }
 
     function isAuthority(role) {
-        return isCaptain(role) || role === 'cr' || role === 'teacher';
+        return isCaptain(role);
+    }
+
+    function validatePassword(value) {
+        if (!value) return 'Password is required';
+        if (value.length < 4) return 'Password must be at least 4 characters';
+        return null;
     }
 
     function copyToClipboard(text) {
@@ -132,6 +135,28 @@ const Utils = (function () {
         } finally {
             textarea.remove();
         }
+    }
+
+    function cmToFeetInches(cm) {
+        const totalInches = cm / 2.54;
+        let feet = Math.floor(totalInches / 12);
+        let inches = Math.round(totalInches - feet * 12);
+        if (inches === 12) {
+            feet += 1;
+            inches = 0;
+        }
+        return { feet, inches };
+    }
+
+    function feetInchesToCm(feet, inches) {
+        const ft = parseInt(feet, 10) || 0;
+        const inch = parseInt(inches, 10) || 0;
+        return Math.round((ft * 12 + inch) * 2.54);
+    }
+
+    function formatFeetInches(cm) {
+        const { feet, inches } = cmToFeetInches(cm);
+        return `${feet}'${inches}"`;
     }
 
     function getBasePath() {
@@ -156,6 +181,7 @@ const Utils = (function () {
         validateRequired,
         validateRollNumber,
         validateMinLength,
+        validatePassword,
         capitalize,
         truncate,
         slugify,
@@ -165,6 +191,9 @@ const Utils = (function () {
         isCaptain,
         isAuthority,
         copyToClipboard,
+        cmToFeetInches,
+        feetInchesToCm,
+        formatFeetInches,
         getBasePath,
         navigate
     };

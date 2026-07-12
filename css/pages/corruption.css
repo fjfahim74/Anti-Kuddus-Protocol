@@ -323,3 +323,114 @@
         gap: var(--space-2);
     }
 }
+
+/* --- Evidence Dynamic Fields --- */
+.evidence-subfields {
+    border-left: 2px solid var(--glass-border);
+    padding-left: var(--space-4);
+    animation: fadeInScale 0.25s ease;
+}
+
+.evidence-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.evidence-file-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border: 1px dashed var(--glass-border-hover);
+    border-radius: var(--radius-md);
+    background: var(--glass-bg);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.evidence-file-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: var(--glass-bg-hover);
+}
+
+.evidence-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+}
+
+.evidence-file-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+}
+
+.evidence-file-item__name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.evidence-file-item__remove {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+}
+
+.evidence-file-item__remove:hover {
+    color: var(--accent-danger);
+}
+
+.record-card__evidence {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.record-card__evidence-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.record-card__evidence-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-sm);
+    object-fit: cover;
+    border: 1px solid var(--glass-border);
+}
+
+.record-card__evidence-file {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}

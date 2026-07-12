@@ -41,7 +41,10 @@ const SeatsModule = (function () {
 
             var name = document.getElementById('student-name').value.trim();
             var roll = parseInt(document.getElementById('student-roll').value, 10);
-            var height = parseInt(document.getElementById('student-height').value, 10);
+            var feetInput = document.getElementById('student-height-feet').value;
+            var inchesInput = document.getElementById('student-height-inches').value;
+            var feet = parseInt(feetInput, 10);
+            var inches = parseInt(inchesInput, 10);
 
             if (!name) {
                 UI.toast('Please enter a student name', 'warning');
@@ -58,8 +61,13 @@ const SeatsModule = (function () {
                 return;
             }
 
+            if (isNaN(feet)) feet = 0;
+            if (isNaN(inches)) inches = 0;
+
+            var height = Utils.feetInchesToCm(feet, inches);
+
             if (isNaN(height) || height < 100 || height > 220) {
-                UI.toast('Height must be between 100 and 220 cm', 'warning');
+                UI.toast('Height must be between 3\'3" and 7\'2"', 'warning');
                 return;
             }
 
@@ -120,7 +128,7 @@ const SeatsModule = (function () {
                 '<div class="student-item">' +
                     '<span class="student-item__roll">#' + s.roll + '</span>' +
                     '<span class="student-item__name">' + UI.escapeHTML(s.name) + '</span>' +
-                    '<span class="student-item__height">' + s.height + 'cm</span>' +
+                    '<span class="student-item__height">' + Utils.formatFeetInches(s.height) + '</span>' +
                     '<button class="student-item__remove" data-roll="' + s.roll + '" aria-label="Remove ' + UI.escapeHTML(s.name) + '">' +
                         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
                     '</button>' +
@@ -240,7 +248,7 @@ const SeatsModule = (function () {
                         '<span class="seat-cell__roll">#' + cell.roll + '</span>' +
                         '<div class="seat-cell__height-bar ' + barClass + '"></div>';
 
-                    el.title = cell.name + ' (Roll #' + cell.roll + ') — ' + cell.height + 'cm';
+                    el.title = cell.name + ' (Roll #' + cell.roll + ') — ' + Utils.formatFeetInches(cell.height);
                 } else {
                     el.className = 'seat-cell seat-cell--empty';
                 }

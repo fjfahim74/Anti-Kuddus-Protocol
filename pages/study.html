@@ -11,30 +11,19 @@
     <link rel="stylesheet" href="../css/animations.css">
     <link rel="stylesheet" href="../css/pages/study.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236c63ff'/%3E%3Cstop offset='1' stop-color='%2300d4aa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='url(%23g)'/%3E%3Cpath d='M50 10L21 23V47C21 68 33 85 50 92C67 85 79 68 79 47V23L50 10Z' fill='white'/%3E%3Cpath d='M35 49L45 59L66 36' stroke='%236c63ff' stroke-width='9' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to content</a>
 
     <!-- Navbar -->
     <nav class="navbar" role="navigation" aria-label="Main navigation">
-        <a href="../index.html" class="navbar__logo" aria-label="Anti-Kuddus Protocol Home">
-            <div class="navbar__logo-icon">
-                <svg class="logo-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="logo-grad-study" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#6366f1" />
-                            <stop offset="100%" stop-color="#06b6d4" />
-                        </linearGradient>
-                    </defs>
-                    <path d="M16 2L28 8V20L16 30L4 20V8L16 2Z" class="logo-icon-shield" stroke="url(#logo-grad-study)" stroke-width="2" stroke-linejoin="round" fill="rgba(99, 102, 241, 0.05)" />
-                    <path d="M17 7L10 15H16L15 25L22 14H16L17 7Z" class="logo-icon-lightning" fill="url(#logo-grad-study)" />
-                </svg>
-            </div>
-            <span class="logo-brand">A<span class="logo-brand-accent">K</span>P</span>
+        <a href="../dashboard.html" class="navbar__logo" aria-label="Dashboard">
+            <div class="navbar__logo-icon"><svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5L4.5 5.5V11C4.5 15.8 7.6 20.2 12 21.5C16.4 20.2 19.5 15.8 19.5 11V5.5L12 2.5Z" fill="white"/><path d="M8.5 12L10.8 14.3L15.5 9.2" stroke="#6c63ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+            <span>AKP</span>
         </a>
         <div class="navbar__actions">
-            <div class="navbar__user">
+            <div class="navbar__user" role="button" tabindex="0" aria-label="Open profile and settings">
                 <span class="navbar__name"></span>
                 <div class="navbar__avatar"></div>
             </div>
@@ -55,27 +44,6 @@
                     <h1 class="page-header__title">AI Study Assistant</h1>
                     <p class="page-header__subtitle">Get AI-powered syllabus summaries with Google Gemini</p>
                 </div>
-            </div>
-
-            <!-- API Key Banner (shown if no key) -->
-            <div class="api-key-banner glass-card" id="api-key-banner">
-                <div class="api-key-banner__content">
-                    <div class="api-key-banner__icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                    </div>
-                    <div class="api-key-banner__text">
-                        <strong>Gemini API Key Required</strong>
-                        <p>Enter your free Google Gemini API key to use the AI assistant. Your key stays in your browser only.</p>
-                    </div>
-                </div>
-                <div class="api-key-banner__form">
-                    <input type="password" id="api-key-input" class="form-input" placeholder="Paste your Gemini API key here...">
-                    <button class="btn btn--primary btn--sm" id="save-key-btn">Save Key</button>
-                </div>
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="api-key-banner__link">
-                    Get a free API key from Google AI Studio
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                </a>
             </div>
 
             <!-- Main Layout -->
@@ -115,17 +83,6 @@ Photosynthesis is the process by which green plants use sunlight to synthesize f
                             </button>
                         </div>
                     </div>
-
-                    <!-- API Key Management -->
-                    <div class="glass-card api-key-manage" id="api-key-manage" style="display: none;">
-                        <div class="api-key-manage__header">
-                            <span class="api-key-manage__status">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                                Gemini AI Assistant Active
-                            </span>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Output Panel -->
                 <div class="study-output-panel">

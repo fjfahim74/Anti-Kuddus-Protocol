@@ -2,66 +2,9 @@ const StudyModule = (function () {
     var isGenerating = false;
 
     function init() {
-        updateKeyUI();
-        initKeyManagement();
         initForm();
         initHistory();
         renderHistory();
-    }
-
-    function updateKeyUI() {
-        var banner = document.getElementById('api-key-banner');
-        var manage = document.getElementById('api-key-manage');
-
-        if (GeminiAPI.hasApiKey()) {
-            if (banner) banner.style.display = 'none';
-            if (manage) manage.style.display = 'block';
-        } else {
-            if (banner) banner.style.display = 'block';
-            if (manage) manage.style.display = 'none';
-        }
-    }
-
-    function initKeyManagement() {
-        var saveBtn = document.getElementById('save-key-btn');
-        var changeBtn = document.getElementById('change-key-btn');
-        var keyInput = document.getElementById('api-key-input');
-
-        if (saveBtn) {
-            saveBtn.addEventListener('click', function () {
-                var key = keyInput.value.trim();
-                if (!key) {
-                    UI.toast('Please enter an API key', 'warning');
-                    return;
-                }
-                GeminiAPI.setApiKey(key);
-                updateKeyUI();
-                UI.toast('API key saved!', 'success');
-            });
-        }
-
-        if (changeBtn) {
-            changeBtn.addEventListener('click', function () {
-                var banner = document.getElementById('api-key-banner');
-                var manage = document.getElementById('api-key-manage');
-                if (banner) banner.style.display = 'block';
-                if (manage) manage.style.display = 'none';
-                var keyInput2 = document.getElementById('api-key-input');
-                if (keyInput2) {
-                    keyInput2.value = '';
-                    keyInput2.focus();
-                }
-            });
-        }
-
-        if (keyInput) {
-            keyInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    saveBtn.click();
-                }
-            });
-        }
     }
 
     function initForm() {
@@ -119,11 +62,6 @@ const StudyModule = (function () {
 
         if (input.length < 20) {
             UI.toast('Please enter more content for a meaningful summary', 'warning');
-            return;
-        }
-
-        if (!GeminiAPI.hasApiKey()) {
-            UI.toast('Please enter your Gemini API key first', 'warning');
             return;
         }
 

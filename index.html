@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Anti-Kuddus Protocol — Empowering Students Through Safe Reporting, Smart Governance, and AI-Assisted Learning.">
+    <meta name="description" content="Anti-Kuddus Protocol — Empowering Students Through Safe Reporting, Smart Governance, and AI-Assisted Learning.">
     <title>Anti-Kuddus Protocol — Digital Classroom Governance</title>
 
     <link rel="stylesheet" href="css/global.css">
@@ -14,10 +12,8 @@
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/landing.css">
 
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236c63ff'/%3E%3Cstop offset='1' stop-color='%2300d4aa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='24' fill='url(%23g)'/%3E%3Cpath d='M50 10L21 23V47C21 68 33 85 50 92C67 85 79 68 79 47V23L50 10Z' fill='white'/%3E%3Cpath d='M35 49L45 59L66 36' stroke='%236c63ff' stroke-width='9' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 </head>
-
 <body>
     <a href="#main" class="skip-link">Skip to content</a>
 
@@ -32,24 +28,16 @@
     <!-- Navigation -->
     <nav class="landing-nav" role="navigation" aria-label="Main navigation">
         <div class="container flex--between">
-            <a href="index.html" class="landing-nav__logo" aria-label="Anti-Kuddus Protocol Home">
-                <div class="navbar__logo-icon">
-                    <svg class="logo-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logo-grad-nav" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#6366f1" />
-                                <stop offset="100%" stop-color="#06b6d4" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M16 2L28 8V20L16 30L4 20V8L16 2Z" class="logo-icon-shield" stroke="url(#logo-grad-nav)" stroke-width="2" stroke-linejoin="round" fill="rgba(99, 102, 241, 0.05)" />
-                        <path d="M17 7L10 15H16L15 25L22 14H16L17 7Z" class="logo-icon-lightning" fill="url(#logo-grad-nav)" />
-                    </svg>
-                </div>
-                <span class="logo-brand">A<span class="logo-brand-accent">K</span>P</span>
-            </a>
-            <div id="nav-actions" style="display: flex; gap: var(--space-3); align-items: center;">
-                <a href="login.html" class="btn btn--secondary btn--sm" id="nav-login" style="border: 1px solid var(--glass-border); padding: var(--space-1.5) var(--space-4);">Sign In</a>
-                <a href="setup.html" class="btn btn--primary btn--sm" id="nav-signup">Sign Up</a>
+            <div class="landing-nav__logo">
+                <div class="navbar__logo-icon"><svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5L4.5 5.5V11C4.5 15.8 7.6 20.2 12 21.5C16.4 20.2 19.5 15.8 19.5 11V5.5L12 2.5Z" fill="white"/><path d="M8.5 12L10.8 14.3L15.5 9.2" stroke="#6c63ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+                <span>AKP</span>
+            </div>
+            <div class="flex" style="gap: var(--space-2); align-items:center;">
+                <a href="login.html" class="btn btn--secondary btn--sm" id="nav-signin">Sign In</a>
+                <a href="setup.html" class="btn btn--primary btn--sm" id="nav-signup">
+                    Sign Up
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </a>
             </div>
         </div>
     </nav>
@@ -61,10 +49,7 @@
                 <div class="hero__content">
                     <div class="hero__badge animate-in">
                         <span class="badge badge--primary">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                            </svg>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                             <span id="hero-badge-text">Digital Classroom Governance Platform</span>
                         </span>
                     </div>
@@ -77,28 +62,6 @@
                     <p class="hero__subtitle">
                         Empowering Students Through Safe Reporting, Smart Governance, and AI-Assisted Learning.
                     </p>
-
-                    <div class="hero__actions" id="hero-actions">
-                        <a href="login.html" class="btn btn--primary btn--xl" id="hero-login">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                                <polyline points="10 17 15 12 10 7" />
-                                <line x1="15" y1="12" x2="3" y2="12" />
-                            </svg>
-                            Sign In
-                        </a>
-                        <a href="setup.html" class="btn btn--secondary btn--xl" id="hero-signup" style="border: 1px solid var(--glass-border);">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                                <circle cx="9" cy="7" r="4" />
-                                <line x1="19" y1="8" x2="19" y2="14" />
-                                <line x1="22" y1="11" x2="16" y2="11" />
-                            </svg>
-                            Sign Up
-                        </a>
-                    </div>
 
                     <div class="hero__stats">
                         <div class="hero__stat">
@@ -132,15 +95,10 @@
                     <!-- Complaint Portal -->
                     <div class="feature-card glass-card glass-card--clickable" data-feature="complaint">
                         <div class="feature-card__icon feature-card__icon--purple">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-                                <path d="m9 12 2 2 4-4" />
-                            </svg>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
                         </div>
                         <h3 class="feature-card__title">Anonymous Complaints</h3>
-                        <p class="feature-card__desc">Report misconduct safely without revealing your identity. Track
-                            warning levels in real-time.</p>
+                        <p class="feature-card__desc">Report misconduct safely without revealing your identity. Track warning levels in real-time.</p>
                         <div class="feature-card__tags">
                             <span class="chip">Anonymous</span>
                             <span class="chip">Secure</span>
@@ -150,17 +108,10 @@
                     <!-- Seat Planner -->
                     <div class="feature-card glass-card glass-card--clickable" data-feature="seats">
                         <div class="feature-card__icon feature-card__icon--teal">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="3" y="3" width="7" height="7" />
-                                <rect x="14" y="3" width="7" height="7" />
-                                <rect x="14" y="14" width="7" height="7" />
-                                <rect x="3" y="14" width="7" height="7" />
-                            </svg>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                         </div>
                         <h3 class="feature-card__title">Seat Planner</h3>
-                        <p class="feature-card__desc">Generate fair seating arrangements automatically using a smart
-                            height-based algorithm.</p>
+                        <p class="feature-card__desc">Generate fair seating arrangements automatically using a smart height-based algorithm.</p>
                         <div class="feature-card__tags">
                             <span class="chip">Algorithm</span>
                             <span class="chip">Visual</span>
@@ -170,15 +121,10 @@
                     <!-- AI Study Assistant -->
                     <div class="feature-card glass-card glass-card--clickable" data-feature="study">
                         <div class="feature-card__icon feature-card__icon--blue">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path
-                                    d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                            </svg>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
                         </div>
                         <h3 class="feature-card__title">AI Study Assistant</h3>
-                        <p class="feature-card__desc">Paste your syllabus and get instant AI-powered summaries using
-                            Google Gemini.</p>
+                        <p class="feature-card__desc">Paste your syllabus and get instant AI-powered summaries using Google Gemini.</p>
                         <div class="feature-card__tags">
                             <span class="chip">AI Powered</span>
                             <span class="chip">Gemini</span>
@@ -188,16 +134,10 @@
                     <!-- Corruption Ledger -->
                     <div class="feature-card glass-card glass-card--clickable" data-feature="corruption">
                         <div class="feature-card__icon feature-card__icon--amber">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M2 20h20" />
-                                <path d="M5 20V9l7-5 7 5v11" />
-                                <path d="M9 20v-5h6v5" />
-                            </svg>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V9l7-5 7 5v11"/><path d="M9 20v-5h6v5"/></svg>
                         </div>
                         <h3 class="feature-card__title">Corruption Ledger</h3>
-                        <p class="feature-card__desc">Track stolen food and unauthorized charges with visual charts and
-                            statistics.</p>
+                        <p class="feature-card__desc">Track stolen food and unauthorized charges with visual charts and statistics.</p>
                         <div class="feature-card__tags">
                             <span class="chip">Analytics</span>
                             <span class="chip">Charts</span>
@@ -207,16 +147,10 @@
                     <!-- SOS Rescue -->
                     <div class="feature-card glass-card glass-card--clickable" data-feature="sos">
                         <div class="feature-card__icon feature-card__icon--red">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
-                                <line x1="12" y1="9" x2="12" y2="13" />
-                                <line x1="12" y1="17" x2="12.01" y2="17" />
-                            </svg>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         </div>
                         <h3 class="feature-card__title">SOS Rescue</h3>
-                        <p class="feature-card__desc">One-tap emergency alert system. Notify captains instantly with
-                            your location.</p>
+                        <p class="feature-card__desc">One-tap emergency alert system. Notify captains instantly with your location.</p>
                         <div class="feature-card__tags">
                             <span class="chip">Emergency</span>
                             <span class="chip">Real-time</span>
@@ -226,15 +160,10 @@
                     <!-- Rule Checker -->
                     <div class="feature-card glass-card glass-card--clickable" data-feature="rules">
                         <div class="feature-card__icon feature-card__icon--green">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                <path d="m9 12 2 2 4-4" />
-                            </svg>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
                         </div>
                         <h3 class="feature-card__title">Rule Checker</h3>
-                        <p class="feature-card__desc">Verify any school rule claim instantly. No more fake rules from
-                            anyone.</p>
+                        <p class="feature-card__desc">Verify any school rule claim instantly. No more fake rules from anyone.</p>
                         <div class="feature-card__tags">
                             <span class="chip">Verification</span>
                             <span class="chip">Official</span>
@@ -256,55 +185,28 @@
                     <div class="step glass-card glass-card--static">
                         <div class="step__number">1</div>
                         <h3 class="step__title">Login Securely</h3>
-                        <p class="step__desc">Enter your roll number and name. Your identity stays protected for all
-                            anonymous features.</p>
+                        <p class="step__desc">Enter your roll number and name. Your identity stays protected for all anonymous features.</p>
                     </div>
 
                     <div class="step__connector" aria-hidden="true">
-                        <svg width="40" height="24" viewBox="0 0 40 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M0 12h36m-6-6 6 6-6 6" stroke="rgba(108,99,255,0.4)" />
-                        </svg>
+                        <svg width="40" height="24" viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M0 12h36m-6-6 6 6-6 6" stroke="rgba(108,99,255,0.4)"/></svg>
                     </div>
 
                     <div class="step glass-card glass-card--static">
                         <div class="step__number">2</div>
                         <h3 class="step__title">Choose a Module</h3>
-                        <p class="step__desc">Navigate to any of the 6 powerful modules from your personal dashboard.
-                        </p>
+                        <p class="step__desc">Navigate to any of the 6 powerful modules from your personal dashboard.</p>
                     </div>
 
                     <div class="step__connector" aria-hidden="true">
-                        <svg width="40" height="24" viewBox="0 0 40 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M0 12h36m-6-6 6 6-6 6" stroke="rgba(108,99,255,0.4)" />
-                        </svg>
+                        <svg width="40" height="24" viewBox="0 0 40 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M0 12h36m-6-6 6 6-6 6" stroke="rgba(108,99,255,0.4)"/></svg>
                     </div>
 
                     <div class="step glass-card glass-card--static">
                         <div class="step__number">3</div>
                         <h3 class="step__title">Take Action</h3>
-                        <p class="step__desc">Report, plan, study, track, alert, or verify — all in one unified
-                            platform.</p>
+                        <p class="step__desc">Report, plan, study, track, alert, or verify — all in one unified platform.</p>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CTA Section -->
-        <section class="cta section" aria-label="Call to action">
-            <div class="container">
-                <div class="cta__card glass-card--elevated">
-                    <h2 class="cta__title">Ready to Restore<br><span class="text-gradient">Classroom Justice?</span>
-                    </h2>
-                    <p class="cta__desc">Join the movement. Every report matters. Every voice counts.</p>
-                    <a href="setup.html" class="btn btn--primary btn--xl" id="cta-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                        </svg>
-                        Get Started Now
-                    </a>
                 </div>
             </div>
         </section>
@@ -316,29 +218,17 @@
             <div class="footer__content">
                 <div class="footer__brand">
                     <div class="footer__logo">
-                        <div class="navbar__logo-icon">
-                            <svg class="logo-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <defs>
-                                    <linearGradient id="logo-grad-footer" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stop-color="#6366f1" />
-                                        <stop offset="100%" stop-color="#06b6d4" />
-                                    </linearGradient>
-                                </defs>
-                                <path d="M16 2L28 8V20L16 30L4 20V8L16 2Z" class="logo-icon-shield" stroke="url(#logo-grad-footer)" stroke-width="2" stroke-linejoin="round" fill="rgba(99, 102, 241, 0.05)" />
-                                <path d="M17 7L10 15H16L15 25L22 14H16L17 7Z" class="logo-icon-lightning" fill="url(#logo-grad-footer)" />
-                            </svg>
-                        </div>
-                        <span class="logo-brand logo-brand--full">ANTI-KUDDUS <span class="logo-brand-accent">PROTOCOL</span></span>
+                        <div class="navbar__logo-icon"><svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5L4.5 5.5V11C4.5 15.8 7.6 20.2 12 21.5C16.4 20.2 19.5 15.8 19.5 11V5.5L12 2.5Z" fill="white"/><path d="M8.5 12L10.8 14.3L15.5 9.2" stroke="#6c63ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+                        <span>Anti-Kuddus Protocol</span>
                     </div>
                     <p class="footer__tagline">Empowering classrooms everywhere</p>
                 </div>
                 <div class="footer__links">
                     <a href="#features">Features</a>
-                    <a href="login.html">Login</a>
                 </div>
             </div>
             <div class="footer__bottom">
-                <p>Built with ❤️ for a fair classroom &nbsp;|&nbsp; Hackathon 2026</p>
+                <p>&copy; 2026 Algonova. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -350,100 +240,15 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var config = Storage.get('config');
-            var session = Storage.get('session');
-            var isSetup = config && config.setupComplete;
-            var isLoggedIn = session && session.isLoggedIn;
 
-            if (isSetup) {
-                // Update badge text
+            if (config && config.setupComplete) {
                 var badge = document.getElementById('hero-badge-text');
-                if (badge) {
-                    var cls = config.class || (config.className ? config.className.split(' ')[0] : 'N/A');
-                    var sec = config.section || (config.className ? config.className.split(' ').slice(1).join(' ') : 'N/A');
-                    badge.textContent = config.schoolName + ' — ' + cls + ' ' + sec;
-                }
+                if (badge) badge.textContent = config.schoolName + ' — Class ' + config.className;
 
-                // Update student count
                 var statEl = document.getElementById('stat-students');
                 if (statEl) statEl.textContent = config.studentCount;
-            } else {
-                // Default fallback if no config
-                var badge = document.getElementById('hero-badge-text');
-                if (badge) {
-                    badge.textContent = 'Digital Classroom Governance Platform';
-                }
-                var statEl = document.getElementById('stat-students');
-                if (statEl) statEl.textContent = '60';
-            }
-
-            // Update Nav actions
-            var navActions = document.getElementById('nav-actions');
-            if (navActions) {
-                if (isLoggedIn) {
-                    navActions.innerHTML = '<a href="dashboard.html" class="btn btn--primary btn--sm">Go to Dashboard</a>';
-                } else {
-                    navActions.innerHTML = `
-                        <a href="login.html" class="btn btn--secondary btn--sm" style="border: 1px solid var(--glass-border); padding: var(--space-1.5) var(--space-4);">Sign In</a>
-                        <a href="setup.html" class="btn btn--primary btn--sm">Sign Up</a>
-                    `;
-                }
-            }
-
-            // Update Hero actions
-            var heroActions = document.getElementById('hero-actions');
-            if (heroActions) {
-                if (isLoggedIn) {
-                    heroActions.innerHTML = `
-                        <a href="dashboard.html" class="btn btn--primary btn--xl">
-                            Go to Dashboard
-                        </a>
-                        <a href="#features" class="btn btn--secondary btn--xl">
-                            Explore Features
-                        </a>
-                    `;
-                } else {
-                    heroActions.innerHTML = `
-                        <a href="login.html" class="btn btn--primary btn--xl">
-                            Sign In
-                        </a>
-                        <a href="setup.html" class="btn btn--secondary btn--xl" style="border: 1px solid var(--glass-border);">
-                            Sign Up
-                        </a>
-                    `;
-                }
-            }
-
-            // Update bottom CTA button
-            var ctaBtn = document.getElementById('cta-btn');
-            if (ctaBtn) {
-                if (isLoggedIn) {
-                    ctaBtn.href = 'dashboard.html';
-                    ctaBtn.textContent = 'Go to Dashboard';
-                } else {
-                    ctaBtn.href = 'setup.html';
-                    ctaBtn.textContent = 'Sign Up Now';
-                }
-            }
-
-            // Update footer links
-            var footerLogin = document.querySelector('.footer__links a[href="login.html"]');
-            if (footerLogin) {
-                if (isLoggedIn) {
-                    footerLogin.href = 'dashboard.html';
-                    footerLogin.textContent = 'Dashboard';
-                } else {
-                    footerLogin.textContent = 'Sign In';
-                    if (!document.getElementById('footer-signup-link')) {
-                        var registerLink = document.createElement('a');
-                        registerLink.href = 'setup.html';
-                        registerLink.id = 'footer-signup-link';
-                        registerLink.textContent = 'Sign Up';
-                        footerLogin.parentNode.appendChild(registerLink);
-                    }
-                }
             }
         });
     </script>
 </body>
-
 </html>
