@@ -175,6 +175,53 @@
                 </div>
             </section>
 
+            <!-- Mood Meter -->
+            <section class="dashboard-section" aria-label="Mood meter">
+                <div class="section__header">
+                    <h2 class="section__title">Class Mood Meter</h2>
+                    <p class="section__subtitle">How is the class feeling today?</p>
+                </div>
+                <div class="glass-card mood-card">
+                    <div class="mood-emojis" id="mood-emojis">
+                        <button class="mood-emoji" data-mood="happy" aria-label="Happy">
+                            <span class="mood-emoji__icon">😊</span>
+                            <span class="mood-emoji__label">Happy</span>
+                            <span class="mood-emoji__count" id="mood-count-happy">0</span>
+                        </button>
+                        <button class="mood-emoji" data-mood="neutral" aria-label="Neutral">
+                            <span class="mood-emoji__icon">😐</span>
+                            <span class="mood-emoji__label">Neutral</span>
+                            <span class="mood-emoji__count" id="mood-count-neutral">0</span>
+                        </button>
+                        <button class="mood-emoji" data-mood="frustrated" aria-label="Frustrated">
+                            <span class="mood-emoji__icon">😤</span>
+                            <span class="mood-emoji__label">Frustrated</span>
+                            <span class="mood-emoji__count" id="mood-count-frustrated">0</span>
+                        </button>
+                        <button class="mood-emoji" data-mood="bored" aria-label="Bored">
+                            <span class="mood-emoji__icon">😴</span>
+                            <span class="mood-emoji__label">Bored</span>
+                            <span class="mood-emoji__count" id="mood-count-bored">0</span>
+                        </button>
+                    </div>
+                    <div class="mood-bars" id="mood-bars">
+                        <div class="mood-bar" data-mood="happy">
+                            <div class="mood-bar__fill mood-bar__fill--happy" id="mood-bar-happy" style="width: 0%;"></div>
+                        </div>
+                        <div class="mood-bar" data-mood="neutral">
+                            <div class="mood-bar__fill mood-bar__fill--neutral" id="mood-bar-neutral" style="width: 0%;"></div>
+                        </div>
+                        <div class="mood-bar" data-mood="frustrated">
+                            <div class="mood-bar__fill mood-bar__fill--frustrated" id="mood-bar-frustrated" style="width: 0%;"></div>
+                        </div>
+                        <div class="mood-bar" data-mood="bored">
+                            <div class="mood-bar__fill mood-bar__fill--bored" id="mood-bar-bored" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <p class="mood-note" id="mood-note">Tap an emoji to vote anonymously</p>
+                </div>
+            </section>
+
             <!-- Recent Activity -->
             <section class="dashboard-section" aria-label="Recent activity">
                 <div class="section__header">
@@ -235,7 +282,77 @@
 
             // Recent Activity
             renderRecentActivity(complaints, sosAlerts, corruption);
+
+            // Mood Meter
+            initMoodMeter();
         });
+
+        function initMoodMeter() {
+            var moodData = Storage.get('mood') || { today: null, votes: {} };
+            var today = new Date().toISOString().split('T')[0];
+
+            if (!moodData.today || moodData.today !== today) {
+                moodData = { today: today, votes: { happy: 0, neutral: 0, frustrated: 0, bored: 0 }, voters: [] };
+                Storage.set('mood', moodData);
+            }
+
+            renderMoodBars(moodData.votes);
+            renderMoodCounts(moodData.votes);
+
+            var session = App.getSession();
+            var hasVoted = moodData.voters && moodData.voters.indexOf(session.rollNumber) !== -1;
+
+            if (hasVoted) {
+                document.getElementById('mood-note').textContent = 'You already voted today!';
+            }
+
+            document.querySelectorAll('.mood-emoji').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var currentMood = Storage.get('mood') || { today: today, votes: { happy: 0, neutral: 0, frustrated: 0, bored: 0 }, voters: [] };
+                    var sess = App.getSession();
+
+                    if (currentMood.voters && currentMood.voters.indexOf(sess.rollNumber) !== -1) {
+                        UI.toast('You already voted today!', 'warning', 2000);
+                        return;
+                    }
+
+                    var mood = btn.dataset.mood;
+                    currentMood.votes[mood] = (currentMood.votes[mood] || 0) + 1;
+                    if (!currentMood.voters) currentMood.voters = [];
+                    currentMood.voters.push(sess.rollNumber);
+                    Storage.set('mood', currentMood);
+
+                    renderMoodBars(currentMood.votes);
+                    renderMoodCounts(currentMood.votes);
+                    document.getElementById('mood-note').textContent = 'Thanks for voting!';
+
+                    btn.classList.add('mood-emoji--selected');
+                    UI.toast('Mood recorded!', 'success', 1500);
+                });
+            });
+        }
+
+        function renderMoodBars(votes) {
+            var total = (votes.happy || 0) + (votes.neutral || 0) + (votes.frustrated || 0) + (votes.bored || 0);
+            if (total === 0) total = 1;
+
+            var moods = ['happy', 'neutral', 'frustrated', 'bored'];
+            moods.forEach(function (mood) {
+                var bar = document.getElementById('mood-bar-' + mood);
+                if (bar) {
+                    var pct = ((votes[mood] || 0) / total) * 100;
+                    bar.style.width = pct + '%';
+                }
+            });
+        }
+
+        function renderMoodCounts(votes) {
+            var moods = ['happy', 'neutral', 'frustrated', 'bored'];
+            moods.forEach(function (mood) {
+                var el = document.getElementById('mood-count-' + mood);
+                if (el) el.textContent = votes[mood] || 0;
+            });
+        }
 
         function animateStat(id, value) {
             var el = document.getElementById(id);

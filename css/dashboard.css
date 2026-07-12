@@ -203,6 +203,101 @@
     color: var(--text-muted);
 }
 
+/* --- Mood Meter --- */
+.mood-card {
+    padding: var(--space-6) var(--space-8);
+}
+
+.mood-emojis {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.mood-emoji {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    min-width: 80px;
+}
+
+.mood-emoji:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+    transform: translateY(-4px);
+}
+
+.mood-emoji:active {
+    transform: translateY(0) scale(0.95);
+}
+
+.mood-emoji--selected {
+    border-color: var(--accent-primary);
+    background: rgba(108, 99, 255, 0.08);
+    pointer-events: none;
+}
+
+.mood-emoji__icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.mood-emoji__label {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-weight: var(--weight-medium);
+}
+
+.mood-emoji__count {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+}
+
+.mood-bars {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    height: 8px;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    background: var(--glass-bg);
+}
+
+.mood-bar {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-full);
+}
+
+.mood-bar__fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 0.6s ease;
+}
+
+.mood-bar__fill--happy { background: #22c55e; }
+.mood-bar__fill--neutral { background: #38bdf8; }
+.mood-bar__fill--frustrated { background: #f97316; }
+.mood-bar__fill--bored { background: #a855f7; }
+
+.mood-note {
+    text-align: center;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
 /* --- Responsive --- */
 @media (max-width: 1024px) {
     .modules-grid {
@@ -251,5 +346,22 @@
 
     .stat-card__value {
         font-size: var(--text-2xl);
+    }
+
+    .mood-emojis {
+        gap: var(--space-2);
+    }
+
+    .mood-emoji {
+        padding: var(--space-3);
+        min-width: 60px;
+    }
+
+    .mood-emoji__icon {
+        font-size: 1.5rem;
+    }
+
+    .mood-card {
+        padding: var(--space-5);
     }
 }
