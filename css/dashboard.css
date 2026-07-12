@@ -1,0 +1,255 @@
+/* ============================================
+   DASHBOARD
+   ============================================ */
+
+/* --- Welcome --- */
+.dashboard-welcome {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-8) 0;
+    gap: var(--space-4);
+}
+
+.dashboard-welcome__greeting {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    margin-bottom: var(--space-1);
+}
+
+.dashboard-welcome__greeting span {
+    color: var(--accent-primary);
+}
+
+.dashboard-welcome__subtitle {
+    font-size: var(--text-base);
+    color: var(--text-muted);
+}
+
+/* --- Dashboard Section --- */
+.dashboard-section {
+    margin-top: var(--space-10);
+}
+
+.dashboard-section .section__header {
+    margin-bottom: var(--space-6);
+}
+
+/* --- Module Cards Grid --- */
+.modules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-5);
+}
+
+.module-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+}
+
+.module-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.module-card[data-module="complaint"]::before { background: radial-gradient(circle at 20% 50%, rgba(108, 99, 255, 0.06), transparent 70%); }
+.module-card[data-module="seats"]::before { background: radial-gradient(circle at 20% 50%, rgba(0, 212, 170, 0.06), transparent 70%); }
+.module-card[data-module="study"]::before { background: radial-gradient(circle at 20% 50%, rgba(56, 189, 248, 0.06), transparent 70%); }
+.module-card[data-module="corruption"]::before { background: radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.06), transparent 70%); }
+.module-card[data-module="sos"]::before { background: radial-gradient(circle at 20% 50%, rgba(239, 68, 68, 0.06), transparent 70%); }
+.module-card[data-module="rules"]::before { background: radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.06), transparent 70%); }
+
+.module-card:hover::before {
+    opacity: 1;
+}
+
+.module-card__icon {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+}
+
+.module-card__icon--purple {
+    background: rgba(108, 99, 255, 0.12);
+    color: var(--accent-primary);
+}
+
+.module-card__icon--teal {
+    background: rgba(0, 212, 170, 0.12);
+    color: var(--accent-secondary);
+}
+
+.module-card__icon--blue {
+    background: rgba(56, 189, 248, 0.12);
+    color: var(--accent-info);
+}
+
+.module-card__icon--amber {
+    background: rgba(251, 191, 36, 0.12);
+    color: var(--accent-warning);
+}
+
+.module-card__icon--red {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--accent-danger);
+}
+
+.module-card__icon--green {
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+}
+
+.module-card__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.module-card__title {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    margin-bottom: var(--space-1);
+}
+
+.module-card__desc {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    line-height: var(--leading-normal);
+}
+
+.module-card__arrow {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    transition: all var(--transition-base);
+}
+
+.module-card:hover .module-card__arrow {
+    color: var(--accent-primary);
+    transform: translateX(4px);
+}
+
+/* --- Stats Override for Dashboard --- */
+.stats-row .stat-card {
+    padding: var(--space-5);
+}
+
+.stats-row .stat-card__icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-3);
+}
+
+/* --- Recent Activity --- */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+}
+
+.activity-item__icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+
+.activity-item__icon--purple { background: rgba(108, 99, 255, 0.1); }
+.activity-item__icon--red { background: rgba(239, 68, 68, 0.1); }
+.activity-item__icon--amber { background: rgba(251, 191, 36, 0.1); }
+.activity-item__icon--teal { background: rgba(0, 212, 170, 0.1); }
+.activity-item__icon--blue { background: rgba(56, 189, 248, 0.1); }
+
+.activity-item__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-item__text {
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.activity-item__time {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+    .modules-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-welcome {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: var(--space-6) 0;
+    }
+
+    .dashboard-welcome__greeting {
+        font-size: var(--text-2xl);
+    }
+
+    .modules-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .module-card {
+        padding: var(--space-5);
+    }
+
+    .module-card__icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .dashboard-section {
+        margin-top: var(--space-8);
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-3);
+    }
+
+    .stats-row .stat-card {
+        padding: var(--space-4);
+    }
+
+    .stat-card__value {
+        font-size: var(--text-2xl);
+    }
+}

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup — Anti-Kuddus Protocol</title>
+
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/animations.css">
+
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+
+    <style>
+        .setup-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .setup-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .setup-bg__orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.35;
+        }
+
+        .setup-bg__orb--1 {
+            width: 450px;
+            height: 450px;
+            background: rgba(108, 99, 255, 0.18);
+            top: -15%;
+            left: -10%;
+            animation: orbFloat 20s ease-in-out infinite;
+        }
+
+        .setup-bg__orb--2 {
+            width: 350px;
+            height: 350px;
+            background: rgba(0, 212, 170, 0.12);
+            bottom: -10%;
+            right: -10%;
+            animation: orbFloat 24s ease-in-out infinite reverse;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -40px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(40px, 30px) scale(1.03); }
+        }
+
+        .setup-card {
+            width: 100%;
+            max-width: 480px;
+            padding: var(--space-10);
+            animation: fadeInScale 0.5s ease;
+        }
+
+        .setup-card__header {
+            text-align: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .setup-card__logo {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto var(--space-5);
+            background: var(--gradient-primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-2xl);
+            box-shadow: var(--shadow-glow-primary);
+        }
+
+        .setup-card__title {
+            font-size: var(--text-2xl);
+            font-weight: var(--weight-bold);
+            margin-bottom: var(--space-2);
+        }
+
+        .setup-card__subtitle {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            line-height: var(--leading-relaxed);
+        }
+
+        .setup-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-5);
+        }
+
+        .setup-form .btn--primary {
+            margin-top: var(--space-2);
+            padding: var(--space-4) var(--space-6);
+            font-size: var(--text-base);
+        }
+
+        .setup-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+        }
+
+        .setup-footer {
+            text-align: center;
+            margin-top: var(--space-6);
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+        }
+
+        .setup-back {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            position: fixed;
+            top: var(--space-6);
+            left: var(--space-6);
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            transition: color var(--transition-fast);
+            z-index: 10;
+        }
+
+        .setup-back:hover {
+            color: var(--text-primary);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+
+        .shake { animation: shake 0.4s ease; }
+
+        @media (max-width: 480px) {
+            .setup-card { padding: var(--space-6); }
+            .setup-row { grid-template-columns: 1fr; }
+            .setup-back { top: var(--space-4); left: var(--space-4); }
+        }
+    </style>
+</head>
+<body>
+    <a href="#setup-form" class="skip-link">Skip to setup form</a>
+
+    <div class="setup-bg" aria-hidden="true">
+        <div class="setup-bg__orb setup-bg__orb--1"></div>
+        <div class="setup-bg__orb setup-bg__orb--2"></div>
+    </div>
+
+    <a href="index.html" class="setup-back" aria-label="Back to landing page">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        Back
+    </a>
+
+    <main class="setup-page">
+        <div class="setup-card glass-card--elevated">
+            <div class="setup-card__header">
+                <div class="setup-card__logo">⚡</div>
+                <h1 class="setup-card__title">Set Up Your Class</h1>
+                <p class="setup-card__subtitle">Configure your institute and classroom details. This only needs to be done once.</p>
+            </div>
+
+            <form class="setup-form" id="setup-form" novalidate>
+                <div class="form-group">
+                    <label class="form-label form-label--required" for="school-name">Institute / School Name</label>
+                    <input
+                        type="text"
+                        id="school-name"
+                        class="form-input"
+                        placeholder="e.g. Dhaka Model High School"
+                        required
+                        autocomplete="organization"
+                    >
+                    <span class="form-error hidden" id="school-error"></span>
+                </div>
+
+                <div class="setup-row">
+                    <div class="form-group">
+                        <label class="form-label form-label--required" for="class-name">Class / Section</label>
+                        <input
+                            type="text"
+                            id="class-name"
+                            class="form-input"
+                            placeholder="e.g. 7-B"
+                            required
+                        >
+                        <span class="form-error hidden" id="class-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label form-label--required" for="student-count">Total Students</label>
+                        <input
+                            type="number"
+                            id="student-count"
+                            class="form-input"
+                            placeholder="e.g. 48"
+                            min="5"
+                            max="200"
+                            required
+                        >
+                        <span class="form-error hidden" id="count-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="captain-name">1st Captain Name <span style="color: var(--text-muted); font-weight: 400;">(optional)</span></label>
+                    <input
+                        type="text"
+                        id="captain-name"
+                        class="form-input"
+                        placeholder="e.g. Kuddus"
+                        autocomplete="off"
+                    >
+                    <span class="form-hint">The person whose authority you're monitoring</span>
+                </div>
+
+                <button type="submit" class="btn btn--primary btn--full btn--lg" id="setup-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Complete Setup
+                </button>
+            </form>
+
+            <div class="setup-footer">
+                <p>You can change these settings later from the dashboard</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/ui.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var config = Storage.get('config');
+            if (config && config.schoolName) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            var form = document.getElementById('setup-form');
+            form.addEventListener('submit', handleSetup);
+
+            document.getElementById('school-name').addEventListener('input', function () { clearSetupError('school'); });
+            document.getElementById('class-name').addEventListener('input', function () { clearSetupError('class'); });
+            document.getElementById('student-count').addEventListener('input', function () { clearSetupError('count'); });
+        });
+
+        function handleSetup(e) {
+            e.preventDefault();
+
+            var schoolName = document.getElementById('school-name').value.trim();
+            var className = document.getElementById('class-name').value.trim();
+            var studentCount = parseInt(document.getElementById('student-count').value, 10);
+            var captainName = document.getElementById('captain-name').value.trim();
+            var hasError = false;
+
+            if (!schoolName) {
+                showSetupError('school', 'School name is required');
+                hasError = true;
+            }
+
+            if (!className) {
+                showSetupError('class', 'Class / Section is required');
+                hasError = true;
+            }
+
+            if (isNaN(studentCount) || studentCount < 5 || studentCount > 200) {
+                showSetupError('count', 'Enter a number between 5 and 200');
+                hasError = true;
+            }
+
+            if (hasError) {
+                var card = document.querySelector('.setup-card');
+                card.classList.add('shake');
+                card.addEventListener('animationend', function () { card.classList.remove('shake'); }, { once: true });
+                return;
+            }
+
+            var setupBtn = document.getElementById('setup-btn');
+            UI.setLoading(setupBtn, true);
+
+            setTimeout(function () {
+                var config = {
+                    schoolName: schoolName,
+                    className: className,
+                    studentCount: studentCount,
+                    captainName: captainName || 'Captain',
+                    theme: 'dark',
+                    soundEnabled: true,
+                    setupComplete: true,
+                    setupDate: new Date().toISOString()
+                };
+
+                Storage.set('config', config);
+                UI.toast('Setup complete! Welcome to AKP.', 'success');
+
+                setTimeout(function () {
+                    window.location.href = 'login.html';
+                }, 500);
+            }, 600);
+        }
+
+        function showSetupError(field, message) {
+            var errorEl = document.getElementById(field + '-error');
+            var inputMap = { school: 'school-name', class: 'class-name', count: 'student-count' };
+            var inputEl = document.getElementById(inputMap[field]);
+
+            if (errorEl) { errorEl.textContent = message; errorEl.classList.remove('hidden'); }
+            if (inputEl) { inputEl.classList.add('form-input--error'); }
+        }
+
+        function clearSetupError(field) {
+            var errorEl = document.getElementById(field + '-error');
+            var inputMap = { school: 'school-name', class: 'class-name', count: 'student-count' };
+            var inputEl = document.getElementById(inputMap[field]);
+
+            if (errorEl) { errorEl.textContent = ''; errorEl.classList.add('hidden'); }
+            if (inputEl) { inputEl.classList.remove('form-input--error'); }
+        }
+    </script>
+</body>
+</html>

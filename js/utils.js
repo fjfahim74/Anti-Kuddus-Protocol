@@ -43,10 +43,11 @@ const Utils = (function () {
         return null;
     }
 
-    function validateRollNumber(value) {
+    function validateRollNumber(value, maxStudents) {
+        const max = maxStudents || 60;
         const num = parseInt(value, 10);
-        if (isNaN(num) || num < 1 || num > 60) {
-            return 'Roll number must be between 1 and 60';
+        if (isNaN(num) || num < 1 || num > max) {
+            return 'Roll number must be between 1 and ' + max;
         }
         return null;
     }

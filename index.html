@@ -32,8 +32,8 @@
                 <div class="navbar__logo-icon">⚡</div>
                 <span>AKP</span>
             </div>
-            <a href="login.html" class="btn btn--primary btn--sm">
-                Enter Platform
+            <a href="setup.html" class="btn btn--primary btn--sm" id="nav-cta">
+                Get Started
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
         </div>
@@ -47,7 +47,7 @@
                     <div class="hero__badge animate-in">
                         <span class="badge badge--primary">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                            Class 7-B Governance Platform
+                            <span id="hero-badge-text">Digital Classroom Governance Platform</span>
                         </span>
                     </div>
 
@@ -61,9 +61,9 @@
                     </p>
 
                     <div class="hero__actions">
-                        <a href="login.html" class="btn btn--primary btn--xl">
+                        <a href="setup.html" class="btn btn--primary btn--xl" id="hero-cta">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                            Enter Platform
+                            Get Started
                         </a>
                         <a href="#features" class="btn btn--secondary btn--xl">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m12 8-4 4h8l-4 4"/></svg>
@@ -78,7 +78,7 @@
                         </div>
                         <div class="hero__stat-divider"></div>
                         <div class="hero__stat">
-                            <span class="hero__stat-value" data-count="48">48</span>
+                            <span class="hero__stat-value" id="stat-students">--</span>
                             <span class="hero__stat-label">Students</span>
                         </div>
                         <div class="hero__stat-divider"></div>
@@ -225,7 +225,7 @@
                 <div class="cta__card glass-card--elevated">
                     <h2 class="cta__title">Ready to Restore<br><span class="text-gradient">Classroom Justice?</span></h2>
                     <p class="cta__desc">Join the movement. Every report matters. Every voice counts.</p>
-                    <a href="login.html" class="btn btn--primary btn--xl">
+                    <a href="setup.html" class="btn btn--primary btn--xl" id="cta-btn">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                         Get Started Now
                     </a>
@@ -243,7 +243,7 @@
                         <div class="navbar__logo-icon">⚡</div>
                         <span>Anti-Kuddus Protocol</span>
                     </div>
-                    <p class="footer__tagline">Empowering Class 7-B since 2026</p>
+                    <p class="footer__tagline">Empowering classrooms everywhere</p>
                 </div>
                 <div class="footer__links">
                     <a href="#features">Features</a>
@@ -260,5 +260,39 @@
     <script src="js/utils.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var config = Storage.get('config');
+            var isSetup = config && config.setupComplete;
+
+            if (isSetup) {
+                // Update badge text
+                var badge = document.getElementById('hero-badge-text');
+                if (badge) badge.textContent = config.schoolName + ' — Class ' + config.className;
+
+                // Update student count
+                var statEl = document.getElementById('stat-students');
+                if (statEl) statEl.textContent = config.studentCount;
+
+                // Update all CTA links to go to login instead of setup
+                var links = ['hero-cta', 'nav-cta', 'cta-btn'];
+                links.forEach(function (id) {
+                    var el = document.getElementById(id);
+                    if (el) {
+                        el.href = 'login.html';
+                        if (id !== 'nav-cta') {
+                            el.innerHTML = el.innerHTML.replace('Get Started', 'Enter Platform');
+                        } else {
+                            el.innerHTML = el.innerHTML.replace('Get Started', 'Enter Platform');
+                        }
+                    }
+                });
+
+                // Update footer link
+                var footerLogin = document.querySelector('.footer__links a[href="login.html"]');
+                if (footerLogin) footerLogin.textContent = 'Login';
+            }
+        });
+    </script>
 </body>
 </html>

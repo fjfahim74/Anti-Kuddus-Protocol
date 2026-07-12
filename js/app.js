@@ -9,10 +9,41 @@ const App = (function () {
         'rules.html'
     ];
 
+    const SETUP_REQUIRED_PAGES = [
+        'login.html',
+        'dashboard.html',
+        'complaint.html',
+        'seats.html',
+        'study.html',
+        'corruption.html',
+        'sos.html',
+        'rules.html'
+    ];
+
     function init() {
+        checkSetup();
         checkAuth();
         initNavbar();
         initSeedData();
+    }
+
+    function checkSetup() {
+        const config = getConfig();
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+
+        const needsSetup = SETUP_REQUIRED_PAGES.some(
+            (p) => currentPage === p || currentPage.endsWith('/' + p)
+        );
+
+        if (needsSetup && (!config || !config.setupComplete)) {
+            Utils.navigate('setup.html');
+            return;
+        }
+
+        if (currentPage === 'setup.html' && config && config.setupComplete) {
+            Utils.navigate('login.html');
+            return;
+        }
     }
 
     function checkAuth() {
@@ -38,14 +69,54 @@ const App = (function () {
         return Storage.get('session');
     }
 
+    function getConfig() {
+        return Storage.get('config');
+    }
+
     function isLoggedIn() {
         const session = getSession();
         return session && session.isLoggedIn;
     }
 
+    function isSetupComplete() {
+        const config = getConfig();
+        return config && config.setupComplete;
+    }
+
+    function getSchoolName() {
+        const config = getConfig();
+        return config ? config.schoolName : 'My School';
+    }
+
+    function getClassName() {
+        const config = getConfig();
+        return config ? config.className : 'My Class';
+    }
+
+    function getStudentCount() {
+        const config = getConfig();
+        return config ? config.studentCount : 60;
+    }
+
+    function getCaptainName() {
+        const config = getConfig();
+        return config ? config.captainName : 'Captain';
+    }
+
+    function getDisplayName() {
+        const config = getConfig();
+        if (!config) return 'Classroom Governance Platform';
+        return config.schoolName + ' — Class ' + config.className;
+    }
+
     function logout() {
         Storage.remove('session');
         Utils.navigate('login.html');
+    }
+
+    function resetSetup() {
+        Storage.clear();
+        Utils.navigate('setup.html');
     }
 
     function initNavbar() {
@@ -141,8 +212,16 @@ const App = (function () {
     return {
         init,
         getSession,
+        getConfig,
         isLoggedIn,
+        isSetupComplete,
+        getSchoolName,
+        getClassName,
+        getStudentCount,
+        getCaptainName,
+        getDisplayName,
         logout,
+        resetSetup,
         getNavbarHTML,
         getPageHeaderHTML
     };
