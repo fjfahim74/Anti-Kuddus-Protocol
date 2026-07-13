@@ -1,3 +1,5 @@
+import { signIn, friendlyAuthError } from './firebase-auth.js';
+
 const Auth = (function () {
     function init() {
         const form = document.getElementById('login-form');
@@ -15,7 +17,7 @@ const Auth = (function () {
         if (clearDataBtn) clearDataBtn.addEventListener('click', handleClearData);
     }
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
         e.preventDefault();
 
         const rollInput = document.getElementById('roll-number');
@@ -44,53 +46,32 @@ const Auth = (function () {
             return;
         }
 
-        const account = Storage.get('account');
-
-        if (!account) {
-            showError('roll', "No account found on this device. Please sign up first.");
-            shakeCard();
-            return;
-        }
-
-        if (account.rollNumber !== rollNumber) {
-            showError('roll', 'No account found with that roll number.');
-            shakeCard();
-            return;
-        }
-
-        if (account.password !== password) {
-            showError('password', 'Incorrect password.');
-            shakeCard();
-            return;
-        }
-
         UI.setLoading(loginBtn, true);
 
-        setTimeout(() => {
-            const session = {
-                rollNumber: account.rollNumber,
-                name: account.name,
-                role: account.role,
-                captainLevel: account.captainLevel || null,
-                isLoggedIn: true,
-                loginTime: new Date().toISOString()
-            };
-
-            Storage.set('session', session);
-            UI.toast('Welcome back, ' + account.name + '!', 'success');
-
+        try {
+            const profile = await signIn(rollNumber, password);
+            UI.toast('Welcome back, ' + profile.name + '!', 'success');
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 500);
-        }, 500);
+        } catch (err) {
+            UI.setLoading(loginBtn, false);
+            const message = friendlyAuthError(err);
+            if (err && err.code === 'auth/user-not-found') {
+                showError('roll', message);
+            } else {
+                showError('password', message);
+            }
+            shakeCard();
+        }
     }
 
     function handleClearData() {
-        UI.confirm('This will erase all data saved on this device (your account, complaints, everything). You will need to sign up again. Continue?', () => {
+        UI.confirm('This clears data cached on this device (your session cache). Your account itself stays safe in the cloud and you can sign back in normally. Continue?', () => {
             Storage.clear();
             UI.modal({
-                title: 'Data Cleared',
-                content: '<p>All local data has been cleared. You can sign up again whenever you\'re ready.</p>',
+                title: 'Local Cache Cleared',
+                content: '<p>Local cache cleared. Sign in again with your roll number and password.</p>',
                 confirmText: 'OK',
                 showCancel: false
             });
@@ -141,3 +122,5 @@ const Auth = (function () {
         handleLogin
     };
 })();
+
+window.Auth = Auth;

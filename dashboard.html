@@ -245,8 +245,39 @@
     <script src="js/utils.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/app.js"></script>
-    <script>
+    <script type="module">
+        import { guardPage } from './js/firebase-auth.js';
+        import { listenActiveAlerts, requestNotificationPermission, notifyNewAlert } from './js/firebase-sos.js';
+
+        const LOCATION_LABELS = {
+            classroom: 'Classroom', corridor: 'Corridor', playground: 'Playground',
+            canteen: 'Canteen', washroom: 'Washroom Area', library: 'Library',
+            lab: 'Lab', stairs: 'Staircase', gate: 'School Gate', other: 'Other'
+        };
+
         document.addEventListener('DOMContentLoaded', function () {
+            guardPage({ onReady: initDashboard });
+            requestNotificationPermission();
+
+            // Live SOS subscription — updates the "Active SOS" stat instantly and
+            // notifies captains (sound + browser notification) no matter what page
+            // of the dashboard they're looking at.
+            listenActiveAlerts({
+                onChange: function (alerts) {
+                    animateStat('stat-sos', alerts.length);
+                },
+                onNewAlert: function (alert) {
+                    const session = App.getSession();
+                    if (session && Utils.isAuthority(session.role) && session.rollNumber !== alert.triggeredBy) {
+                        const label = LOCATION_LABELS[alert.location] || alert.location;
+                        notifyNewAlert(alert, label);
+                        UI.toast('🚨 SOS from ' + alert.triggeredByName + ' — ' + label, 'warning', 6000);
+                    }
+                }
+            });
+        });
+
+        function initDashboard(profile) {
             const session = App.getSession();
             if (!session) return;
 
@@ -271,23 +302,21 @@
                 subtitleEl.textContent = config.schoolName + ' — Class ' + classLabel;
             }
 
-            // Stats
+            // Stats (stat-sos is populated live by the Firestore subscription above)
             const complaints = Storage.get('complaints') || [];
-            const sosAlerts = (Storage.get('sos') || []).filter(function (a) { return a.status === 'active'; });
             const corruption = Storage.get('corruption') || [];
             const rules = Storage.get('rules') || [];
 
             animateStat('stat-complaints', complaints.length);
-            animateStat('stat-sos', sosAlerts.length);
             animateStat('stat-corruption', corruption.length);
             animateStat('stat-rules', rules.length);
 
             // Recent Activity
-            renderRecentActivity(complaints, sosAlerts, corruption);
+            renderRecentActivity(complaints, [], corruption);
 
             // Mood Meter
             initMoodMeter();
-        });
+        }
 
         function initMoodMeter() {
             var moodData = Storage.get('mood') || { today: null, votes: {} };

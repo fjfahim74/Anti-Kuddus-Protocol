@@ -1,6 +1,21 @@
+import {
+    sendSOS,
+    resolveAlert as fbResolveAlert,
+    dismissAlert as fbDismissAlert,
+    listenActiveAlerts,
+    listenResolvedAlerts,
+    requestNotificationPermission,
+    notifyNewAlert
+} from '../firebase-sos.js';
+import { guardPage } from '../firebase-auth.js';
+
 const SOSModule = (function () {
     var COOLDOWN_SECONDS = 30;
     var cooldownTimer = null;
+    var currentActive = [];
+    var currentResolved = [];
+    var unsubscribeActive = null;
+    var unsubscribeResolved = null;
 
     var LOCATION_LABELS = {
         classroom: 'Classroom',
@@ -16,9 +31,54 @@ const SOSModule = (function () {
     };
 
     function init() {
-        initPanicButton();
-        initClearResolved();
-        renderAlerts();
+        if (!document.getElementById('sos-panic-btn')) return; // not on the SOS page
+
+        // Make sure we know who's signed in (and kick to login if not) before
+        // subscribing to alerts, since captain-only actions depend on role.
+        guardPage({
+            onReady: function () {
+                initPanicButton();
+                initClearResolved();
+                requestNotificationPermission();
+                subscribeToAlerts();
+            }
+        });
+    }
+
+    function subscribeToAlerts() {
+        if (unsubscribeActive) unsubscribeActive();
+        if (unsubscribeResolved) unsubscribeResolved();
+
+        unsubscribeActive = listenActiveAlerts({
+            onChange: function (alerts) {
+                currentActive = alerts;
+                renderActiveAlerts(currentActive);
+                updateCounts();
+            },
+            onNewAlert: function (alert) {
+                var session = App.getSession();
+                // Notify everyone viewing this page except the person who triggered it —
+                // in practice this is what makes captains get the signal immediately.
+                if (!session || session.rollNumber !== alert.triggeredBy) {
+                    var label = LOCATION_LABELS[alert.location] || alert.location;
+                    notifyNewAlert(alert, label);
+                    UI.toast('🚨 SOS from ' + alert.triggeredByName + ' — ' + label, 'warning', 6000);
+                }
+            }
+        });
+
+        unsubscribeResolved = listenResolvedAlerts(function (alerts) {
+            currentResolved = alerts;
+            renderResolvedAlerts(currentResolved);
+            updateCounts();
+        });
+    }
+
+    function updateCounts() {
+        var activeCount = document.getElementById('active-count');
+        var resolvedCount = document.getElementById('resolved-count');
+        if (activeCount) activeCount.textContent = currentActive.length;
+        if (resolvedCount) resolvedCount.textContent = '(' + currentResolved.length + ')';
     }
 
     function initPanicButton() {
@@ -32,14 +92,12 @@ const SOSModule = (function () {
         var btn = document.getElementById('clear-resolved-btn');
         if (btn) {
             btn.addEventListener('click', function () {
-                var alerts = Storage.get('sos') || [];
-                var resolved = alerts.filter(function (a) { return a.status === 'resolved'; });
-                if (resolved.length === 0) return;
+                if (currentResolved.length === 0) return;
 
                 UI.confirm('Clear all resolved alerts?', function () {
-                    var remaining = alerts.filter(function (a) { return a.status !== 'resolved'; });
-                    Storage.set('sos', remaining);
-                    renderAlerts();
+                    currentResolved.forEach(function (a) {
+                        fbDismissAlert(a.id).catch(function () {});
+                    });
                     UI.toast('Resolved alerts cleared', 'info');
                 });
             });
@@ -53,31 +111,29 @@ const SOSModule = (function () {
         var location = document.getElementById('sos-location').value;
         var btn = document.getElementById('sos-panic-btn');
 
-        var alert = {
-            id: Utils.generateId('sos'),
-            triggeredBy: session.rollNumber,
-            triggeredByName: session.name,
-            location: location,
-            status: 'active',
-            timestamp: new Date().toISOString(),
-            resolvedBy: null,
-            resolvedAt: null
-        };
+        btn.disabled = true;
 
-        Storage.push('sos', alert);
+        sendSOS({
+            rollNumber: session.rollNumber,
+            name: session.name,
+            location: location
+        }).then(function () {
+            btn.disabled = false;
+            btn.classList.add('sos-panic-btn--triggered');
+            btn.innerHTML =
+                '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' +
+                '<span>SENT</span>';
 
-        btn.classList.add('sos-panic-btn--triggered');
-        btn.innerHTML =
-            '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' +
-            '<span>SENT</span>';
+            var status = document.getElementById('sos-status');
+            if (status) status.style.display = 'flex';
 
-        var status = document.getElementById('sos-status');
-        if (status) status.style.display = 'flex';
-
-        renderAlerts();
-        UI.toast('SOS Alert sent! Captains have been notified.', 'warning', 4000);
-
-        startCooldown();
+            UI.toast('SOS Alert sent! Captains have been notified.', 'warning', 4000);
+            startCooldown();
+        }).catch(function (err) {
+            btn.disabled = false;
+            console.error(err);
+            UI.toast('Could not send SOS — check your internet connection and try again.', 'danger', 5000);
+        });
     }
 
     function startCooldown() {
@@ -119,40 +175,21 @@ const SOSModule = (function () {
 
     function resolveAlert(id) {
         var session = App.getSession();
-        var alerts = Storage.get('sos') || [];
-
-        alerts = alerts.map(function (a) {
-            if (a.id === id) {
-                a.status = 'resolved';
-                a.resolvedBy = session.name;
-                a.resolvedAt = new Date().toISOString();
-            }
-            return a;
+        fbResolveAlert(id, session.name).then(function () {
+            UI.toast('Alert resolved', 'success');
+        }).catch(function (err) {
+            console.error(err);
+            UI.toast('Failed to resolve alert', 'danger');
         });
-
-        Storage.set('sos', alerts);
-        renderAlerts();
-        UI.toast('Alert resolved', 'success');
     }
 
     function dismissAlert(id) {
-        Storage.removeFromArray('sos', function (a) { return a.id === id; });
-        renderAlerts();
-        UI.toast('Alert dismissed', 'info', 1500);
-    }
-
-    function renderAlerts() {
-        var alerts = Storage.get('sos') || [];
-        var active = alerts.filter(function (a) { return a.status === 'active'; });
-        var resolved = alerts.filter(function (a) { return a.status === 'resolved'; });
-
-        renderActiveAlerts(active);
-        renderResolvedAlerts(resolved);
-
-        var activeCount = document.getElementById('active-count');
-        var resolvedCount = document.getElementById('resolved-count');
-        if (activeCount) activeCount.textContent = active.length;
-        if (resolvedCount) resolvedCount.textContent = '(' + resolved.length + ')';
+        fbDismissAlert(id).then(function () {
+            UI.toast('Alert dismissed', 'info', 1500);
+        }).catch(function (err) {
+            console.error(err);
+            UI.toast('Failed to dismiss alert', 'danger');
+        });
     }
 
     function renderActiveAlerts(active) {
@@ -171,7 +208,6 @@ const SOSModule = (function () {
         var isAuthority = session && Utils.isAuthority(session.role);
 
         var html = '';
-        active.sort(function (a, b) { return new Date(b.timestamp) - new Date(a.timestamp); });
 
         active.forEach(function (alert) {
             html +=
@@ -227,7 +263,6 @@ const SOSModule = (function () {
         }
 
         var html = '';
-        resolved.sort(function (a, b) { return new Date(b.resolvedAt) - new Date(a.resolvedAt); });
 
         resolved.forEach(function (alert) {
             html +=

@@ -594,7 +594,9 @@
             });
         }
     </script>
-    <script>
+    <script type="module">
+        import { signUp, friendlyAuthError } from './js/firebase-auth.js';
+
         document.addEventListener('DOMContentLoaded', function () {
             var roleCaptain = document.getElementById('role-captain');
             var roleStudent = document.getElementById('role-student');
@@ -621,7 +623,7 @@
             document.getElementById('confirm-password').addEventListener('input', function () { clearSetupError('confirm-password'); });
         });
 
-        function handleSetup(e) {
+        async function handleSetup(e) {
             e.preventDefault();
 
             var schoolName = document.getElementById('school-name').value.trim();
@@ -693,9 +695,21 @@
             var setupBtn = document.getElementById('setup-btn');
             UI.setLoading(setupBtn, true);
 
-            setTimeout(function () {
+            try {
+                await signUp({
+                    rollNumber: rollNumber,
+                    name: userName,
+                    role: role,
+                    captainLevel: captainLevel,
+                    password: password,
+                    schoolName: schoolName,
+                    className: className,
+                    section: sectionName,
+                    studentCount: studentCount
+                });
+
                 var existingConfig = Storage.get('config') || {};
-                var config = {
+                Storage.set('config', {
                     schoolName: schoolName,
                     className: className,
                     section: sectionName,
@@ -704,34 +718,25 @@
                     soundEnabled: existingConfig.soundEnabled !== false,
                     setupComplete: true,
                     setupDate: new Date().toISOString()
-                };
+                });
 
-                var account = {
-                    rollNumber: rollNumber,
-                    name: userName,
-                    role: role,
-                    captainLevel: captainLevel,
-                    password: password
-                };
-
-                var session = {
-                    rollNumber: rollNumber,
-                    name: userName,
-                    role: role,
-                    captainLevel: captainLevel,
-                    isLoggedIn: true,
-                    loginTime: new Date().toISOString()
-                };
-
-                Storage.set('config', config);
-                Storage.set('account', account);
-                Storage.set('session', session);
                 UI.toast('Welcome, ' + userName + '!', 'success');
 
                 setTimeout(function () {
                     window.location.href = 'dashboard.html';
                 }, 500);
-            }, 600);
+            } catch (err) {
+                UI.setLoading(setupBtn, false);
+                var message = friendlyAuthError(err);
+                if (err && err.code === 'auth/email-already-in-use') {
+                    showSetupError('roll', message);
+                } else {
+                    showSetupError('password', message);
+                }
+                var card = document.querySelector('.setup-card');
+                card.classList.add('shake');
+                card.addEventListener('animationend', function () { card.classList.remove('shake'); }, { once: true });
+            }
         }
 
         function showSetupError(field, message) {
