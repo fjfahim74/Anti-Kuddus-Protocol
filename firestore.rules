@@ -16,8 +16,6 @@ service cloud.firestore {
     }
 
     // --- users/{uid} ---
-    // Anyone signed in can read profiles (needed to show names on SOS alerts, etc).
-    // A user can only create/update their OWN profile document.
     match /users/{uid} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.auth.uid == uid;
@@ -26,17 +24,12 @@ service cloud.firestore {
     }
 
     // --- classes/{classId} ---
-    // Shared class config (school name, class, section, roster size).
-    // Any signed-in member of the class can read/update it (e.g. during setup).
     match /classes/{classId} {
       allow read: if isSignedIn();
       allow write: if isSignedIn();
     }
 
     // --- sos_alerts/{alertId} ---
-    // Any signed-in student can create an alert (only for themselves).
-    // Anyone signed in can read (so the alert list renders for everyone).
-    // Only captains can resolve/dismiss (update/delete) alerts.
     match /sos_alerts/{alertId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.triggeredBy == myProfile().rollNumber;
@@ -44,9 +37,7 @@ service cloud.firestore {
       allow delete: if isCaptain();
     }
 
-    // --- Everything else (complaints, corruption_reports, etc.) ---
-    // Not yet migrated off localStorage — see SETUP_GUIDE.md.
-    // Default-deny until you add explicit rules for a collection.
+    // --- Everything else — default-deny until migrated ---
     match /{document=**} {
       allow read, write: if false;
     }
