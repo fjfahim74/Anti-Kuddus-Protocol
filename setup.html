@@ -85,6 +85,14 @@
                 radial-gradient(circle at 80% 80%, rgba(0, 212, 170, 0.1), transparent 50%),
                 #05050a;
             overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        [data-theme="light"] .auth-shell__visual {
+            background:
+                radial-gradient(circle at 25% 20%, rgba(108, 99, 255, 0.10), transparent 55%),
+                radial-gradient(circle at 80% 80%, rgba(0, 212, 170, 0.08), transparent 50%),
+                #eef0f6;
         }
 
         .auth-shell__visual canvas {
@@ -93,6 +101,11 @@
             width: 100%;
             height: 100%;
             display: block;
+            /* Nudge the rendered scene rightward, away from the card edge.
+               Scaled up so the shift never reveals an empty edge; the panel's
+               overflow: hidden keeps it fully clipped inside the box. */
+            transform: scale(1.18) translateX(7%);
+            transform-origin: center;
         }
 
         /* Hide the Spline watermark badge, wherever it gets injected */
@@ -100,6 +113,27 @@
             display: none !important;
             opacity: 0 !important;
             pointer-events: none !important;
+        }
+
+        /* The watermark is baked into the WebGL canvas pixels (not a real DOM
+           link) when loaded via the runtime API, so it can't be targeted with
+           a selector — mask its corner instead. The rightward shift above
+           already pushes it past the clipped edge; this is a safety net. */
+        .auth-shell__visual-watermark-mask {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 45%;
+            height: 15%;
+            min-height: 56px;
+            background: radial-gradient(circle at 100% 100%, #05050a 40%, rgba(5, 5, 10, 0.85) 65%, rgba(5, 5, 10, 0) 100%);
+            z-index: 3;
+            pointer-events: none;
+            transition: background-color 0.3s ease;
+        }
+
+        [data-theme="light"] .auth-shell__visual-watermark-mask {
+            background: radial-gradient(circle at 100% 100%, #eef0f6 40%, rgba(238, 240, 246, 0.85) 65%, rgba(238, 240, 246, 0) 100%);
         }
 
         .auth-shell__visual-badge {
@@ -119,6 +153,12 @@
             font-size: 11px;
             letter-spacing: 0.01em;
             color: rgba(255, 255, 255, 0.85);
+        }
+
+        [data-theme="light"] .auth-shell__visual-badge {
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(20, 20, 30, 0.12);
+            color: rgba(20, 20, 30, 0.75);
         }
 
         .auth-shell__visual-badge .dot {
@@ -415,9 +455,9 @@
                     <span class="form-error hidden" id="count-error"></span>
                 </div>
 
-                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: var(--space-4) 0;">
+                <hr style="border: none; border-top: 1px solid var(--glass-border); margin: 0;">
 
-                <p style="font-size: var(--text-sm); color: var(--text-muted); text-align: center; margin-bottom: var(--space-2);">Now create your login</p>
+                <p style="font-size: var(--text-sm); color: var(--text-muted); text-align: center; margin: 0;">Now create your login</p>
 
                 <div class="setup-row">
                     <div class="form-group">
@@ -520,6 +560,7 @@
 
         <div class="auth-shell__visual" aria-hidden="true">
             <canvas id="canvas3d"></canvas>
+            <div class="auth-shell__visual-watermark-mask"></div>
             <div class="auth-shell__visual-badge"><span class="dot"></span> Interactive Workspace Ecosystem</div>
         </div>
         </div>
@@ -535,8 +576,21 @@
         const canvas = document.getElementById('canvas3d');
         if (canvas) {
             const app = new Application(canvas);
-            app.load('https://prod.spline.design/N1COK7UWps1EnDa0/scene.splinecode').catch(function () {
+
+            function splineBgFor(theme) {
+                return theme === 'light' ? '#eef0f6' : '#05050a';
+            }
+
+            app.load('https://prod.spline.design/N1COK7UWps1EnDa0/scene.splinecode').then(function () {
+                var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+                app.setBackgroundColor(splineBgFor(theme));
+            }).catch(function () {
                 canvas.closest('.auth-shell__visual').style.display = 'none';
+            });
+
+            document.addEventListener('themechange', function (e) {
+                var theme = (e.detail && e.detail.theme) || document.documentElement.getAttribute('data-theme') || 'dark';
+                app.setBackgroundColor(splineBgFor(theme));
             });
         }
     </script>

@@ -23,6 +23,7 @@ const App = (function () {
         const config = getConfig();
         const resolved = theme || (config && config.theme) || 'dark';
         document.documentElement.setAttribute('data-theme', resolved);
+        document.dispatchEvent(new CustomEvent('themechange', { detail: { theme: resolved } }));
     }
 
     function setTheme(theme) {
