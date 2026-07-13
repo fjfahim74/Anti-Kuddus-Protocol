@@ -1,20 +1,4 @@
-// netlify/functions/summarize.js
-//
-// Server-side proxy for the AI Study Assistant.
-// The API key NEVER touches the browser — it is read from Netlify's
-// environment variables (Site settings > Environment variables) and used
-// only here, on the server.
-//
-// Set this in Netlify:
-//   GEMINI_API_KEY = <your real key>
-//
-// Get a free key at https://aistudio.google.com/apikey
-
-// 'gemini-flash-latest' is Google's auto-updating alias for their current
-// GA flash model, so this won't silently break again when a specific
-// dated model (like gemini-2.5-flash) gets deprecated. If you want a
-// pinned, more predictable version instead, use 'gemini-3.5-flash'.
-const MODEL = 'gemini-2.5-flash';
+const MODEL = 'gemini-flash-latest';
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/' + MODEL + ':generateContent';
 
 const PROMPTS = {
