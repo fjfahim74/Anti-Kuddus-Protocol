@@ -8,15 +8,16 @@ import { getFirestore } from 'https://www.gstatic.com/firebasejs/12.15.0/firebas
 
 // TODO: paste the config object from
 // Firebase Console -> Project settings -> General -> Your apps -> SDK setup and configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "PASTE_YOUR_API_KEY",
-    authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
-    projectId: "PASTE_YOUR_PROJECT_ID",
-    storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
-    messagingSenderId: "PASTE_YOUR_SENDER_ID",
-    appId: "PASTE_YOUR_APP_ID"
+  apiKey: "AIzaSyAZ1MfaHYIFTkHObZbVrODwuB-isTipgJc",
+  authDomain: "anti-kuddus-protocol-007.firebaseapp.com",
+  projectId: "anti-kuddus-protocol-007",
+  storageBucket: "anti-kuddus-protocol-007.firebasestorage.app",
+  messagingSenderId: "796202523604",
+  appId: "1:796202523604:web:867645048c62a252ae5441",
+  measurementId: "G-992WCBVG34"
 };
-
 export const firebaseApp = initializeApp(firebaseConfig);
 export const auth = getAuth(firebaseApp);
 export const db = getFirestore(firebaseApp);
