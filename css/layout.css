@@ -5,7 +5,7 @@
 /* --- Page Wrapper --- */
 .page {
     min-height: 100vh;
-    padding-top: var(--navbar-height);
+    padding-top: calc(var(--navbar-height) + var(--space-6));
     animation: pageIn 0.4s ease;
 }
 

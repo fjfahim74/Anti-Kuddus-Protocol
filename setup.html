@@ -211,6 +211,8 @@
 <body>
     <a href="#setup-form" class="skip-link">Skip to setup form</a>
 
+    <button type="button" class="theme-toggle theme-toggle--floating" id="theme-toggle" aria-label="Toggle dark/light mode"></button>
+
     <div class="setup-bg" aria-hidden="true">
         <div class="setup-bg__orb setup-bg__orb--1"></div>
         <div class="setup-bg__orb setup-bg__orb--2"></div>
@@ -391,6 +393,7 @@
     <script src="js/storage.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var roleCaptain = document.getElementById('role-captain');
@@ -491,13 +494,14 @@
             UI.setLoading(setupBtn, true);
 
             setTimeout(function () {
+                var existingConfig = Storage.get('config') || {};
                 var config = {
                     schoolName: schoolName,
                     className: className,
                     section: sectionName,
                     studentCount: studentCount,
-                    theme: 'dark',
-                    soundEnabled: true,
+                    theme: existingConfig.theme || 'dark',
+                    soundEnabled: existingConfig.soundEnabled !== false,
                     setupComplete: true,
                     setupDate: new Date().toISOString()
                 };

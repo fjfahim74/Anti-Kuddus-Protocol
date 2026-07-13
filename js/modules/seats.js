@@ -1,6 +1,13 @@
 const SeatsModule = (function () {
     let students = [];
 
+    var MOCK_NAMES = [
+        'Rahim', 'Karim', 'Fatima', 'Ayesha', 'Tanvir', 'Sadia', 'Nayeem', 'Mim',
+        'Arif', 'Rifat', 'Nusrat', 'Shanto', 'Priya', 'Tanjim', 'Farhan', 'Lamia',
+        'Hridoy', 'Jannat', 'Rakib', 'Sumaiya', 'Imran', 'Tasnim', 'Rezwan', 'Anika',
+        'Sabbir', 'Mahin', 'Ruma', 'Zarin', 'Nafis', 'Ishika'
+    ];
+
     function init() {
         loadStudents();
         initForm();
@@ -8,16 +15,96 @@ const SeatsModule = (function () {
         renderStudentList();
 
         var saved = Storage.get('seatplan');
-        if (saved && saved.grid) {
-            document.getElementById('grid-rows').value = saved.rows || 6;
-            document.getElementById('grid-cols').value = saved.cols || 8;
-            renderGrid(saved.grid, saved.rows, saved.cols);
+        if (saved) {
+            if (saved.rows) document.getElementById('grid-rows').value = saved.rows;
+            if (saved.cols) document.getElementById('grid-cols').value = saved.cols;
+            if (saved.algorithm) document.getElementById('sort-algorithm').value = saved.algorithm;
         }
+
+        // Roster (mock or real) always has data now, so render the seating
+        // chart immediately instead of waiting for a manual "Generate" click.
+        generateLayout();
+    }
+
+    // Deterministic-ish pseudo-random height so the same roll always gets
+    // the same mock height until they report a real one and re-save.
+    function mockHeightForRoll(roll) {
+        var seed = Math.sin(roll * 9301 + 49297) * 233280;
+        var frac = seed - Math.floor(seed);
+        return Math.round(140 + frac * 45); // ~140cm - 185cm mock range
+    }
+
+    function mockNameForRoll(roll) {
+        var base = MOCK_NAMES[(roll - 1) % MOCK_NAMES.length];
+        return roll > MOCK_NAMES.length ? base + ' ' + roll : base;
+    }
+
+    function buildMockRoster(count) {
+        var roster = [];
+        for (var i = 1; i <= count; i++) {
+            roster.push({
+                roll: i,
+                name: mockNameForRoll(i),
+                height: mockHeightForRoll(i),
+                reported: false
+            });
+        }
+        return roster;
     }
 
     function loadStudents() {
         var saved = Storage.get('seatplan');
-        students = saved && saved.students ? saved.students : [];
+        var totalCount = App.getStudentCount() || 60;
+
+        if (saved && saved.students && saved.students.length === totalCount) {
+            students = saved.students;
+        } else {
+            // No roster yet, or class size changed in setup — regenerate
+            // mock placeholders for everyone (real reported heights, if any
+            // still fit the new count, are preserved by roll below).
+            var previous = (saved && saved.students) || [];
+            students = buildMockRoster(totalCount);
+            previous.forEach(function (p) {
+                if (p.reported && p.roll <= totalCount) {
+                    var match = students.find(function (s) { return s.roll === p.roll; });
+                    if (match) {
+                        match.name = p.name;
+                        match.height = p.height;
+                        match.reported = true;
+                    }
+                }
+            });
+            saveStudents();
+        }
+
+        syncCurrentUserIdentity();
+    }
+
+    // Keeps the logged-in student's name in the roster matched to their
+    // session, and reflects it in the "My Height" card.
+    function syncCurrentUserIdentity() {
+        var session = App.getSession();
+        var identityEl = document.getElementById('my-height-identity');
+        if (!session || !session.rollNumber) return;
+
+        var me = students.find(function (s) { return s.roll === session.rollNumber; });
+        if (me) {
+            me.name = session.name || me.name;
+            me.isYou = true;
+
+            if (me.reported) {
+                var fi = Utils.cmToFeetInches(me.height);
+                var feetInput = document.getElementById('student-height-feet');
+                var inchesInput = document.getElementById('student-height-inches');
+                if (feetInput) feetInput.value = fi.feet;
+                if (inchesInput) inchesInput.value = fi.inches;
+            }
+        }
+
+        if (identityEl) {
+            identityEl.innerHTML = 'You are <strong>' + UI.escapeHTML(session.name || 'Student') +
+                '</strong>, Roll <strong>#' + session.rollNumber + '</strong>';
+        }
     }
 
     function saveStudents() {
@@ -27,39 +114,22 @@ const SeatsModule = (function () {
     }
 
     function initForm() {
-        var form = document.getElementById('add-student-form');
+        var form = document.getElementById('my-height-form');
         if (!form) return;
-
-        var config = App.getConfig();
-        var rollInput = document.getElementById('student-roll');
-        if (rollInput && config) {
-            rollInput.max = config.studentCount;
-        }
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
 
-            var name = document.getElementById('student-name').value.trim();
-            var roll = parseInt(document.getElementById('student-roll').value, 10);
+            var session = App.getSession();
+            if (!session || !session.rollNumber) {
+                UI.toast('Could not identify your account. Please log in again.', 'error');
+                return;
+            }
+
             var feetInput = document.getElementById('student-height-feet').value;
             var inchesInput = document.getElementById('student-height-inches').value;
             var feet = parseInt(feetInput, 10);
             var inches = parseInt(inchesInput, 10);
-
-            if (!name) {
-                UI.toast('Please enter a student name', 'warning');
-                return;
-            }
-
-            if (isNaN(roll) || roll < 1) {
-                UI.toast('Please enter a valid roll number', 'warning');
-                return;
-            }
-
-            if (students.some(function (s) { return s.roll === roll; })) {
-                UI.toast('Roll #' + roll + ' already exists', 'error');
-                return;
-            }
 
             if (isNaN(feet)) feet = 0;
             if (isNaN(inches)) inches = 0;
@@ -71,14 +141,25 @@ const SeatsModule = (function () {
                 return;
             }
 
-            students.push({ roll: roll, name: name, height: height });
-            students.sort(function (a, b) { return a.roll - b.roll; });
+            var me = students.find(function (s) { return s.roll === session.rollNumber; });
+            if (!me) {
+                me = { roll: session.rollNumber, name: session.name, isYou: true };
+                students.push(me);
+                students.sort(function (a, b) { return a.roll - b.roll; });
+            }
+
+            me.name = session.name || me.name;
+            me.height = height;
+            me.reported = true;
+            me.isYou = true;
+
             saveStudents();
             renderStudentList();
 
-            form.reset();
-            document.getElementById('student-name').focus();
-            UI.toast(name + ' added', 'success', 1500);
+            // Update the seating chart immediately — no separate "Generate" click needed.
+            generateLayout();
+
+            UI.toast('Your height was saved — seating chart updated', 'success', 1800);
         });
     }
 
@@ -86,25 +167,24 @@ const SeatsModule = (function () {
         document.getElementById('generate-btn').addEventListener('click', generateLayout);
 
         document.getElementById('clear-students-btn').addEventListener('click', function () {
-            if (students.length === 0) return;
-            UI.confirm('Remove all students and clear the layout?', function () {
-                students = [];
-                Storage.remove('seatplan');
+            UI.confirm('Reset everyone\'s height back to placeholder mock data? Your own reported height will be lost too.', function () {
+                var totalCount = App.getStudentCount() || 60;
+                students = buildMockRoster(totalCount);
+                saveStudents();
+                syncCurrentUserIdentity();
+                var feetInput = document.getElementById('student-height-feet');
+                var inchesInput = document.getElementById('student-height-inches');
+                if (feetInput) feetInput.value = '';
+                if (inchesInput) inchesInput.value = '';
                 renderStudentList();
-                clearGrid();
-                UI.toast('All students cleared', 'info');
+                generateLayout();
+                UI.toast('Roster reset to mock data', 'info');
             });
         });
 
         document.getElementById('save-layout-btn').addEventListener('click', function () {
             UI.toast('Layout saved!', 'success');
         });
-    }
-
-    function removeStudent(roll) {
-        students = students.filter(function (s) { return s.roll !== roll; });
-        saveStudents();
-        renderStudentList();
     }
 
     function renderStudentList() {
@@ -117,31 +197,28 @@ const SeatsModule = (function () {
         if (students.length === 0) {
             container.innerHTML =
                 '<div class="empty-state" style="padding: var(--space-8) var(--space-4);">' +
-                    '<p class="empty-state__text">No students added yet.</p>' +
+                    '<p class="empty-state__text">No students in class yet. Set a class size in Setup.</p>' +
                 '</div>';
             return;
         }
 
         var html = '';
         students.forEach(function (s) {
+            var itemClass = 'student-item' + (s.isYou ? ' student-item--you' : '');
+            var statusBadge = s.reported
+                ? '<span class="student-item__status student-item__status--reported" title="Real height reported">✓</span>'
+                : '<span class="student-item__status student-item__status--mock" title="Placeholder mock data">mock</span>';
+
             html +=
-                '<div class="student-item">' +
+                '<div class="' + itemClass + '">' +
                     '<span class="student-item__roll">#' + s.roll + '</span>' +
-                    '<span class="student-item__name">' + UI.escapeHTML(s.name) + '</span>' +
+                    '<span class="student-item__name">' + UI.escapeHTML(s.name) + (s.isYou ? ' <em>(You)</em>' : '') + '</span>' +
                     '<span class="student-item__height">' + Utils.formatFeetInches(s.height) + '</span>' +
-                    '<button class="student-item__remove" data-roll="' + s.roll + '" aria-label="Remove ' + UI.escapeHTML(s.name) + '">' +
-                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-                    '</button>' +
+                    statusBadge +
                 '</div>';
         });
 
         container.innerHTML = html;
-
-        container.querySelectorAll('.student-item__remove').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                removeStudent(parseInt(btn.dataset.roll, 10));
-            });
-        });
     }
 
     function generateLayout() {
@@ -235,7 +312,9 @@ const SeatsModule = (function () {
                 var el = document.createElement('div');
 
                 if (cell) {
-                    el.className = 'seat-cell animate-in';
+                    el.className = 'seat-cell animate-in' +
+                        (cell.isYou ? ' seat-cell--you' : '') +
+                        (!cell.reported ? ' seat-cell--mock' : '');
                     el.style.animationDelay = (r * cols + c) * 20 + 'ms';
 
                     var normalizedH = (cell.height - minH) / range;
@@ -248,7 +327,8 @@ const SeatsModule = (function () {
                         '<span class="seat-cell__roll">#' + cell.roll + '</span>' +
                         '<div class="seat-cell__height-bar ' + barClass + '"></div>';
 
-                    el.title = cell.name + ' (Roll #' + cell.roll + ') — ' + Utils.formatFeetInches(cell.height);
+                    el.title = cell.name + ' (Roll #' + cell.roll + ') — ' + Utils.formatFeetInches(cell.height) +
+                        (cell.reported ? '' : ' (mock)');
                 } else {
                     el.className = 'seat-cell seat-cell--empty';
                 }

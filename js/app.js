@@ -15,6 +15,7 @@ const App = (function () {
         initNavbar();
         initSeedData();
         initSoundEffects();
+        initThemeToggle();
     }
 
     // --- Theme ---
@@ -29,6 +30,44 @@ const App = (function () {
         config.theme = theme;
         Storage.set('config', config);
         applyTheme(theme);
+        syncThemeToggles();
+    }
+
+    const SUN_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+    const MOON_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1Z"/></svg>';
+
+    function syncThemeToggles() {
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        document.querySelectorAll('.theme-toggle').forEach((btn) => {
+            const knob = btn.querySelector('.theme-toggle__knob');
+            if (knob) knob.innerHTML = isLight ? SUN_ICON : MOON_ICON;
+            btn.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+            btn.setAttribute('aria-pressed', String(isLight));
+        });
+    }
+
+    // Works whether or not the person is logged in — theme lives in
+    // `config`, which is created (with a default theme) on first write.
+    function initThemeToggle() {
+        const toggles = document.querySelectorAll('.theme-toggle');
+        if (!toggles.length) return;
+
+        toggles.forEach((btn) => {
+            if (!btn.querySelector('.theme-toggle__icons')) {
+                btn.innerHTML = `
+                    <span class="theme-toggle__icons">${SUN_ICON}${MOON_ICON}</span>
+                    <span class="theme-toggle__knob"></span>
+                `;
+            }
+            btn.addEventListener('click', () => {
+                const config = getConfig();
+                const current = (config && config.theme) || 'dark';
+                setTheme(current === 'dark' ? 'light' : 'dark');
+                playClickSound();
+            });
+        });
+
+        syncThemeToggles();
     }
 
     // --- Sound Effects ---
@@ -235,11 +274,6 @@ const App = (function () {
 
         const content = `
             <div class="profile-modal">
-                <div class="profile-modal__tabs">
-                    <button type="button" class="profile-modal__tab profile-modal__tab--active" data-ptab="profile">Profile</button>
-                    <button type="button" class="profile-modal__tab" data-ptab="settings">Settings</button>
-                </div>
-
                 <div class="profile-modal__panel" data-ppanel="profile">
                     <div class="profile-modal__avatar">
                         <div class="profile-modal__avatar-circle">${Utils.getInitials(session.name)}</div>
@@ -269,68 +303,16 @@ const App = (function () {
                     <p class="profile-modal__meta">${config ? UI.escapeHTML(config.schoolName + ' — Class ' + config.className + (config.section ? '-' + config.section : '')) : ''}</p>
                     <span class="form-error hidden" id="profile-error"></span>
                 </div>
-
-                <div class="profile-modal__panel hidden" data-ppanel="settings">
-                    <div class="profile-modal__setting-row">
-                        <div>
-                            <strong>Touch Sound</strong>
-                            <p class="profile-modal__setting-desc">Play a subtle sound when tapping buttons</p>
-                        </div>
-                        <label class="toggle" for="settings-sound">
-                            <input type="checkbox" id="settings-sound" ${isSoundEnabled() ? 'checked' : ''}>
-                            <span class="toggle__slider"></span>
-                        </label>
-                    </div>
-                    <div class="profile-modal__setting-row">
-                        <div>
-                            <strong>Dark Mode</strong>
-                            <p class="profile-modal__setting-desc">Switch between dark and light appearance</p>
-                        </div>
-                        <label class="toggle" for="settings-theme">
-                            <input type="checkbox" id="settings-theme" ${(config ? config.theme : 'dark') === 'dark' ? 'checked' : ''}>
-                            <span class="toggle__slider"></span>
-                        </label>
-                    </div>
-                </div>
             </div>
         `;
 
         const modalEl = UI.modal({
-            title: 'Profile & Settings',
+            title: 'Profile',
             content,
             confirmText: 'Save Changes',
             cancelText: 'Close',
             onConfirm: () => saveProfileChanges()
         });
-
-        // Tab switching
-        const tabs = modalEl.querySelectorAll('.profile-modal__tab');
-        tabs.forEach((tab) => {
-            tab.addEventListener('click', () => {
-                tabs.forEach((t) => t.classList.remove('profile-modal__tab--active'));
-                tab.classList.add('profile-modal__tab--active');
-                modalEl.querySelectorAll('.profile-modal__panel').forEach((p) => {
-                    p.classList.toggle('hidden', p.dataset.ppanel !== tab.dataset.ptab);
-                });
-            });
-        });
-
-        // Live-apply settings so the person can preview before saving
-        const soundToggle = modalEl.querySelector('#settings-sound');
-        const themeToggle = modalEl.querySelector('#settings-theme');
-
-        if (soundToggle) {
-            soundToggle.addEventListener('change', () => {
-                setSoundEnabled(soundToggle.checked);
-                if (soundToggle.checked) playClickSound();
-            });
-        }
-
-        if (themeToggle) {
-            themeToggle.addEventListener('change', () => {
-                setTheme(themeToggle.checked ? 'dark' : 'light');
-            });
-        }
 
         // Show/hide captain level based on role selection
         const roleSelect = modalEl.querySelector('#profile-role');
@@ -469,6 +451,7 @@ const App = (function () {
         getPageHeaderHTML,
         applyTheme,
         setTheme,
+        initThemeToggle,
         isSoundEnabled,
         setSoundEnabled,
         playClickSound,
