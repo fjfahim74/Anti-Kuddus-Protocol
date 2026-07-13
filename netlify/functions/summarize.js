@@ -1,15 +1,3 @@
-// netlify/functions/summarize.js
-//
-// Server-side proxy for the AI Study Assistant.
-// The API key NEVER touches the browser — it is read from Netlify's
-// environment variables (Site settings > Environment variables) and used
-// only here, on the server.
-//
-// Set this in Netlify:
-//   GEMINI_API_KEY = <your real key>
-//
-// Get a free key at https://aistudio.google.com/apikey
-
 const MODEL = 'gemini-2.5-flash';
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/' + MODEL + ':generateContent';
 
@@ -26,11 +14,18 @@ exports.handler = async function (event) {
         return respond(405, { error: 'Method not allowed' });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    var apiKey = process.env.GEMINI_API_KEY;
+    if (apiKey) {
+        apiKey = apiKey.trim().replace(/^["']|["']$/g, ''); // strip accidental quotes/whitespace
+    }
     if (!apiKey) {
         console.error('GEMINI_API_KEY is not set in the environment');
         return respond(500, { error: 'AI assistant is not configured on the server yet.' });
     }
+    // Safe debug log — only length and first/last 2 chars, never the full key.
+    // Check this in Netlify: Functions tab > summarize > real-time logs.
+    console.log('GEMINI_API_KEY loaded: length=' + apiKey.length +
+        ' starts=' + apiKey.slice(0, 2) + ' ends=' + apiKey.slice(-2));
 
     let body;
     try {
