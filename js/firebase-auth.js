@@ -59,17 +59,28 @@ async function signUp({ rollNumber, name, role, captainLevel, password, schoolNa
         createdAt: serverTimestamp()
     };
 
-    await setDoc(doc(db, 'users', uid), profile);
+    try {
+        await setDoc(doc(db, 'users', uid), profile);
+    } catch (err) {
+        console.error('[firebase-auth] Failed writing users/' + uid + ' — check Firestore rules are published and the database ID is "(default)".', err);
+        throw err;
+    }
 
     // Save/merge the shared class config (school name, class, section, roster size)
     // so it exists for every member of the class, not just whoever set it up first.
-    await setDoc(doc(db, 'classes', CLASS_ID), {
-        schoolName,
-        className,
-        section,
-        studentCount,
-        updatedAt: serverTimestamp()
-    }, { merge: true });
+    // This is best-effort: if it fails, the account still exists and the person
+    // can sign in — we don't want a class-config hiccup to block signup entirely.
+    try {
+        await setDoc(doc(db, 'classes', CLASS_ID), {
+            schoolName,
+            className,
+            section,
+            studentCount,
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+    } catch (err) {
+        console.error('[firebase-auth] Account created, but failed writing classes/' + CLASS_ID + '. Check Firestore rules.', err);
+    }
 
     cacheSession(profile);
     return profile;

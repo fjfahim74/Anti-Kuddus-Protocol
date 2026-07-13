@@ -255,14 +255,28 @@
             lab: 'Lab', stairs: 'Staircase', gate: 'School Gate', other: 'Other'
         };
 
+        let sosUnsubscribe = null;
+
         document.addEventListener('DOMContentLoaded', function () {
-            guardPage({ onReady: initDashboard });
-            requestNotificationPermission();
+            guardPage({
+                onReady: function (profile) {
+                    initDashboard(profile);
+                    requestNotificationPermission();
+                    startSosListener();
+                }
+            });
+        });
+
+        function startSosListener() {
+            if (sosUnsubscribe) return; // already listening
 
             // Live SOS subscription — updates the "Active SOS" stat instantly and
             // notifies captains (sound + browser notification) no matter what page
-            // of the dashboard they're looking at.
-            listenActiveAlerts({
+            // of the dashboard they're looking at. Started only after guardPage
+            // confirms we're actually signed in, otherwise Firestore rejects the
+            // read before the auth token is attached ("Missing or insufficient
+            // permissions").
+            sosUnsubscribe = listenActiveAlerts({
                 onChange: function (alerts) {
                     animateStat('stat-sos', alerts.length);
                 },
@@ -275,7 +289,7 @@
                     }
                 }
             });
-        });
+        }
 
         function initDashboard(profile) {
             const session = App.getSession();
