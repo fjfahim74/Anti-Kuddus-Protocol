@@ -470,6 +470,21 @@
 
                 <form class="login-form" id="login-form" novalidate>
                     <div class="form-group">
+                        <label class="form-label form-label--required" for="institute-name">Institute / School Name</label>
+                        <input
+                            type="text"
+                            id="institute-name"
+                            class="form-input"
+                            placeholder="Enter your institute/school name"
+                            required
+                            autocomplete="organization"
+                            aria-describedby="institute-hint"
+                        >
+                        <span class="form-hint" id="institute-hint">Must match the name used when the class was set up</span>
+                        <span class="form-error hidden" id="institute-error"></span>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label form-label--required" for="roll-number">Roll Number</label>
                         <input
                             type="number"

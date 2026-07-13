@@ -287,6 +287,9 @@
                         notifyNewAlert(alert, label);
                         UI.toast('🚨 SOS from ' + alert.triggeredByName + ' — ' + label, 'warning', 6000);
                     }
+                },
+                onError: function (err) {
+                    UI.toast('SOS alerts aren\'t loading — see console for details (' + (err.code || err.message) + ')', 'danger', 8000);
                 }
             });
         }

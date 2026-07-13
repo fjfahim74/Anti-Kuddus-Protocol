@@ -86,9 +86,36 @@ async function signUp({ rollNumber, name, role, captainLevel, password, schoolNa
     return profile;
 }
 
-async function signIn(rollNumber, password) {
+function normalizeInstituteName(value) {
+    return (value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+async function getClassConfig() {
+    const snap = await getDoc(doc(db, 'classes', CLASS_ID));
+    return snap.exists() ? snap.data() : null;
+}
+
+async function signIn(rollNumber, password, instituteName) {
     const email = emailForRoll(rollNumber);
     const credential = await signInWithEmailAndPassword(auth, email, password);
+
+    // Institute name is checked *after* auth succeeds (reading classes/{id}
+    // requires isSignedIn() per the current Firestore rules), so a wrong
+    // institute name still needs its own explicit rejection + sign-out
+    // rather than silently letting the login through.
+    if (instituteName !== undefined) {
+        const classConfig = await getClassConfig();
+        const typed = normalizeInstituteName(instituteName);
+        const stored = normalizeInstituteName(classConfig && classConfig.schoolName);
+
+        if (!stored || typed !== stored) {
+            await signOut(auth);
+            const err = new Error('That institute name doesn\'t match this account. Please check the spelling and try again.');
+            err.code = 'akp/institute-mismatch';
+            throw err;
+        }
+    }
+
     const profile = await getUserProfile(credential.user.uid);
     if (!profile) {
         throw new Error('Account exists but profile data is missing. Contact your captain.');
@@ -141,6 +168,8 @@ function guardPage({ onReady, redirectPath } = {}) {
 function friendlyAuthError(err) {
     const code = err && err.code;
     switch (code) {
+        case 'akp/institute-mismatch':
+            return err.message;
         case 'auth/email-already-in-use':
             return 'An account with this roll number already exists. Please sign in instead.';
         case 'auth/invalid-credential':
@@ -164,6 +193,7 @@ export {
     signIn,
     signOutUser,
     getUserProfile,
+    getClassConfig,
     changePassword,
     guardPage,
     friendlyAuthError,

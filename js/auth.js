@@ -7,9 +7,11 @@ const Auth = (function () {
 
         form.addEventListener('submit', handleLogin);
 
+        const instituteInput = document.getElementById('institute-name');
         const rollInput = document.getElementById('roll-number');
         const passwordInput = document.getElementById('password');
 
+        if (instituteInput) instituteInput.addEventListener('input', () => clearError('institute'));
         if (rollInput) rollInput.addEventListener('input', () => clearError('roll'));
         if (passwordInput) passwordInput.addEventListener('input', () => clearError('password'));
 
@@ -20,14 +22,22 @@ const Auth = (function () {
     async function handleLogin(e) {
         e.preventDefault();
 
+        const instituteInput = document.getElementById('institute-name');
         const rollInput = document.getElementById('roll-number');
         const passwordInput = document.getElementById('password');
         const loginBtn = document.getElementById('login-btn');
 
+        const instituteName = instituteInput.value.trim();
         const rollNumber = parseInt(rollInput.value, 10);
         const password = passwordInput.value;
 
         let hasError = false;
+
+        const instituteError = Utils.validateRequired(instituteName, 'Institute/School name');
+        if (instituteError) {
+            showError('institute', instituteError);
+            hasError = true;
+        }
 
         const rollError = Utils.validateRequired(rollInput.value, 'Roll number');
         if (rollError) {
@@ -49,7 +59,7 @@ const Auth = (function () {
         UI.setLoading(loginBtn, true);
 
         try {
-            const profile = await signIn(rollNumber, password);
+            const profile = await signIn(rollNumber, password, instituteName);
             UI.toast('Welcome back, ' + profile.name + '!', 'success');
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
@@ -57,7 +67,9 @@ const Auth = (function () {
         } catch (err) {
             UI.setLoading(loginBtn, false);
             const message = friendlyAuthError(err);
-            if (err && err.code === 'auth/user-not-found') {
+            if (err && err.code === 'akp/institute-mismatch') {
+                showError('institute', message);
+            } else if (err && err.code === 'auth/user-not-found') {
                 showError('roll', message);
             } else {
                 showError('password', message);
@@ -88,9 +100,15 @@ const Auth = (function () {
         card.addEventListener('animationend', () => card.classList.remove('shake'), { once: true });
     }
 
+    function fieldInputId(field) {
+        if (field === 'roll') return 'roll-number';
+        if (field === 'institute') return 'institute-name';
+        return field;
+    }
+
     function showError(field, message) {
         const errorEl = document.getElementById(field + '-error');
-        const inputEl = document.getElementById(field === 'roll' ? 'roll-number' : field);
+        const inputEl = document.getElementById(fieldInputId(field));
 
         if (errorEl) {
             errorEl.textContent = message;
@@ -104,7 +122,7 @@ const Auth = (function () {
 
     function clearError(field) {
         const errorEl = document.getElementById(field + '-error');
-        const inputEl = document.getElementById(field === 'roll' ? 'roll-number' : field);
+        const inputEl = document.getElementById(fieldInputId(field));
 
         if (errorEl) {
             errorEl.textContent = '';

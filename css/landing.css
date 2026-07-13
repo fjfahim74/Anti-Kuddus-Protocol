@@ -81,23 +81,8 @@
 }
 
 [data-theme="light"] .landing-nav {
-    background: rgba(28, 28, 40, 0.68);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-[data-theme="light"] .landing-nav__logo {
-    color: #ffffff;
-}
-
-[data-theme="light"] .landing-nav__signin {
-    color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.18);
-}
-
-[data-theme="light"] .landing-nav__signin:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.28);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.75);
+    border-bottom: 1px solid rgba(20, 20, 30, 0.08);
 }
 
 .landing-nav .container {

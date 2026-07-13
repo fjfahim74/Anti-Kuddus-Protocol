@@ -61,7 +61,7 @@ async function dismissAlert(id) {
 // Subscribes to live active alerts for this class. Calls onChange(alerts)
 // every time anything changes, and onNewAlert(alert) exactly once per
 // newly-created alert (used to fire the notification/sound).
-function listenActiveAlerts({ onChange, onNewAlert }) {
+function listenActiveAlerts({ onChange, onNewAlert, onError }) {
     const q = query(
         alertsCol(),
         where('classId', '==', CLASS_ID),
@@ -69,33 +69,44 @@ function listenActiveAlerts({ onChange, onNewAlert }) {
         orderBy('timestamp', 'desc')
     );
 
-    return onSnapshot(q, (snapshot) => {
-        const alerts = snapshot.docs.map((d) => ({
-            id: d.id,
-            ...d.data(),
-            timestamp: toMillisAsISO(d.data().timestamp)
-        }));
+    return onSnapshot(
+        q,
+        (snapshot) => {
+            const alerts = snapshot.docs.map((d) => ({
+                id: d.id,
+                ...d.data(),
+                timestamp: toMillisAsISO(d.data().timestamp)
+            }));
 
-        if (onNewAlert) {
-            snapshot.docChanges().forEach((change) => {
-                if (change.type === 'added') {
-                    const data = change.doc.data();
-                    // Ignore alerts that already existed before this listener attached
-                    // (Firestore fires "added" for the initial snapshot too) —
-                    // only treat alerts created in roughly the last 10s as "new".
-                    const ageMs = Date.now() - toMillis(data.timestamp);
-                    if (ageMs < 10000) {
-                        onNewAlert({ id: change.doc.id, ...data });
+            if (onNewAlert) {
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === 'added') {
+                        const data = change.doc.data();
+                        // Ignore alerts that already existed before this listener attached
+                        // (Firestore fires "added" for the initial snapshot too) —
+                        // only treat alerts created in roughly the last 10s as "new".
+                        const ageMs = Date.now() - toMillis(data.timestamp);
+                        if (ageMs < 10000) {
+                            onNewAlert({ id: change.doc.id, ...data });
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
 
-        if (onChange) onChange(alerts);
-    });
+            if (onChange) onChange(alerts);
+        },
+        (err) => {
+            // Without this, a failure here (most commonly a missing Firestore
+            // composite index for this classId+status+orderBy query) fails
+            // completely silently — captains would just never see alerts,
+            // with nothing in the console explaining why.
+            console.error('[firebase-sos] listenActiveAlerts failed:', err);
+            if (onError) onError(err);
+        }
+    );
 }
 
-function listenResolvedAlerts(onChange) {
+function listenResolvedAlerts(onChange, onError) {
     const q = query(
         alertsCol(),
         where('classId', '==', CLASS_ID),
@@ -103,15 +114,22 @@ function listenResolvedAlerts(onChange) {
         orderBy('resolvedAt', 'desc')
     );
 
-    return onSnapshot(q, (snapshot) => {
-        const alerts = snapshot.docs.map((d) => ({
-            id: d.id,
-            ...d.data(),
-            timestamp: toMillisAsISO(d.data().timestamp),
-            resolvedAt: toMillisAsISO(d.data().resolvedAt)
-        }));
-        onChange(alerts);
-    });
+    return onSnapshot(
+        q,
+        (snapshot) => {
+            const alerts = snapshot.docs.map((d) => ({
+                id: d.id,
+                ...d.data(),
+                timestamp: toMillisAsISO(d.data().timestamp),
+                resolvedAt: toMillisAsISO(d.data().resolvedAt)
+            }));
+            onChange(alerts);
+        },
+        (err) => {
+            console.error('[firebase-sos] listenResolvedAlerts failed:', err);
+            if (onError) onError(err);
+        }
+    );
 }
 
 function toMillisAsISO(ts) {
