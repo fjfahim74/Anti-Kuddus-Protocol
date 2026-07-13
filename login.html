@@ -63,23 +63,142 @@
             75% { transform: translate(40px, 30px) scale(1.03); }
         }
 
-        /* Login card */
-        .login-card {
+        /* Split auth shell: form + 3D visual panel */
+        .auth-shell {
+            display: flex;
+            align-items: stretch;
             width: 100%;
-            max-width: 420px;
-            padding: var(--space-10);
+            max-width: 1080px;
+            min-height: 620px;
+            border-radius: var(--radius-2xl, 28px);
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            background: var(--bg-secondary);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
             animation: fadeInScale 0.5s ease;
         }
 
+        .auth-shell__visual {
+            flex: 1 1 46%;
+            position: relative;
+            min-width: 320px;
+            background:
+                radial-gradient(circle at 25% 20%, rgba(108, 99, 255, 0.16), transparent 55%),
+                radial-gradient(circle at 80% 80%, rgba(0, 212, 170, 0.1), transparent 50%),
+                #05050a;
+            overflow: hidden;
+        }
+
+        .auth-shell__visual canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Hide the Spline watermark badge, wherever it gets injected */
+        .auth-shell__visual a[href*="spline.design"] {
+            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        .auth-shell__visual-badge {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(10, 10, 15, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 11px;
+            letter-spacing: 0.01em;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .auth-shell__visual-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00d4aa;
+            box-shadow: 0 0 8px #00d4aa;
+        }
+
+        /* Login card */
+        .login-card {
+            flex: 1 1 54%;
+            width: 100%;
+            max-width: 460px;
+            padding: var(--space-10);
+        }
+
         .login-card__header {
-            text-align: center;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .login-card__brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .login-card__brand-name {
+            font-family: var(--font-heading);
+            font-weight: var(--weight-bold);
+            font-size: var(--text-base);
+            line-height: 1.2;
+        }
+
+        .login-card__brand-tag {
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .login-card__pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            font-size: 11px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .login-card__pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00d4aa;
+            box-shadow: 0 0 6px #00d4aa;
+        }
+
+        .login-card__title-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
             margin-bottom: var(--space-8);
         }
 
         .login-card__logo {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto var(--space-5);
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
             background: var(--gradient-primary);
             border-radius: var(--radius-lg);
             display: flex;
@@ -239,9 +358,30 @@
             color: var(--accent-danger);
         }
 
+        @media (max-width: 900px) {
+            .auth-shell__visual {
+                display: none;
+            }
+
+            .auth-shell {
+                max-width: 460px;
+                min-height: 0;
+            }
+
+            .login-card {
+                max-width: none;
+            }
+        }
+
         @media (max-width: 480px) {
             .login-card {
                 padding: var(--space-6);
+            }
+
+            .login-card__header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-3);
             }
 
             .role-selector {
@@ -272,60 +412,75 @@
         Back
     </a>
 
-    <!-- Login Card -->
+    <!-- Login Shell -->
     <main class="login-page">
-        <div class="login-card glass-card--elevated">
-            <div class="login-card__header">
-                <div class="login-card__logo"><svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5L4.5 5.5V11C4.5 15.8 7.6 20.2 12 21.5C16.4 20.2 19.5 15.8 19.5 11V5.5L12 2.5Z" fill="white"/><path d="M8.5 12L10.8 14.3L15.5 9.2" stroke="#6c63ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-                <h1 class="login-card__title">Welcome Back</h1>
-                <p class="login-card__subtitle" id="login-subtitle">Enter your details to access the platform</p>
-            </div>
-
-            <form class="login-form" id="login-form" novalidate>
-                <div class="form-group">
-                    <label class="form-label form-label--required" for="roll-number">Roll Number</label>
-                    <input
-                        type="number"
-                        id="roll-number"
-                        class="form-input"
-                        placeholder="Enter your roll number"
-                        min="1"
-                        max="200"
-                        required
-                        autocomplete="off"
-                        aria-describedby="roll-hint"
-                    >
-                    <span class="form-hint" id="roll-hint">Your class roll number</span>
-                    <span class="form-error hidden" id="roll-error"></span>
+        <div class="auth-shell glass-card--elevated">
+            <div class="login-card">
+                <div class="login-card__header">
+                    <div class="login-card__brand">
+                        <div class="login-card__logo"><svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5L4.5 5.5V11C4.5 15.8 7.6 20.2 12 21.5C16.4 20.2 19.5 15.8 19.5 11V5.5L12 2.5Z" fill="white"/><path d="M8.5 12L10.8 14.3L15.5 9.2" stroke="#6c63ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+                        <div>
+                            <div class="login-card__brand-name">Anti-Kuddus Protocol</div>
+                            <div class="login-card__brand-tag">Class Operating System</div>
+                        </div>
+                    </div>
+                    <div class="login-card__pill"><span class="dot"></span> Anonymous Session</div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label form-label--required" for="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        class="form-input"
-                        placeholder="Enter your password"
-                        required
-                        autocomplete="current-password"
-                    >
-                    <span class="form-error hidden" id="password-error"></span>
+                <h1 class="login-card__title" id="login-subtitle-title">Welcome Back</h1>
+                <p class="login-card__subtitle" id="login-subtitle" style="margin-bottom: var(--space-8);">Enter your details to access the platform</p>
+
+                <form class="login-form" id="login-form" novalidate>
+                    <div class="form-group">
+                        <label class="form-label form-label--required" for="roll-number">Roll Number</label>
+                        <input
+                            type="number"
+                            id="roll-number"
+                            class="form-input"
+                            placeholder="Enter your roll number"
+                            min="1"
+                            max="200"
+                            required
+                            autocomplete="off"
+                            aria-describedby="roll-hint"
+                        >
+                        <span class="form-hint" id="roll-hint">Your class roll number</span>
+                        <span class="form-error hidden" id="roll-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label form-label--required" for="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            class="form-input"
+                            placeholder="Enter your password"
+                            required
+                            autocomplete="current-password"
+                        >
+                        <span class="form-error hidden" id="password-error"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn--primary btn--full btn--lg" id="login-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="login-signup-link">
+                    Don't have an account? <a href="setup.html">Sign up</a>
                 </div>
 
-                <button type="submit" class="btn btn--primary btn--full btn--lg" id="login-btn">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                    Sign In
-                </button>
-            </form>
+                <button type="button" class="login-clear-data" id="clear-data-btn">Clear Data</button>
 
-            <div class="login-signup-link">
-                Don't have an account? <a href="setup.html">Sign up</a>
+                <div class="login-footer">
+                    <p>Your identity remains anonymous for all complaints</p>
+                </div>
             </div>
 
-            <button type="button" class="login-clear-data" id="clear-data-btn">Clear Data</button>
-
-            <div class="login-footer">
-                <p>Your identity remains anonymous for all complaints</p>
+            <div class="auth-shell__visual" aria-hidden="true">
+                <canvas id="canvas3d"></canvas>
+                <div class="auth-shell__visual-badge"><span class="dot"></span> Interactive Workspace Ecosystem</div>
             </div>
         </div>
     </main>
@@ -335,5 +490,16 @@
     <script src="js/ui.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/app.js"></script>
+    <script type="module">
+        import { Application } from 'https://cdn.jsdelivr.net/npm/@splinetool/runtime/+esm';
+
+        const canvas = document.getElementById('canvas3d');
+        if (canvas) {
+            const app = new Application(canvas);
+            app.load('https://prod.spline.design/N1COK7UWps1EnDa0/scene.splinecode').catch(function () {
+                canvas.closest('.auth-shell__visual').style.display = 'none';
+            });
+        }
+    </script>
 </body>
 </html>

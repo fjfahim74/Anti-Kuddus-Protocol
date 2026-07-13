@@ -62,22 +62,135 @@
             75% { transform: translate(40px, 30px) scale(1.03); }
         }
 
-        .setup-card {
+        /* Split auth shell: form + 3D visual panel */
+        .auth-shell {
+            display: flex;
+            align-items: stretch;
             width: 100%;
-            max-width: 480px;
+            max-width: 1120px;
+            border-radius: var(--radius-2xl, 28px);
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            background: var(--bg-secondary);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-shell__visual {
+            flex: 1 1 40%;
+            position: relative;
+            min-width: 300px;
+            min-height: 640px;
+            background:
+                radial-gradient(circle at 25% 20%, rgba(108, 99, 255, 0.16), transparent 55%),
+                radial-gradient(circle at 80% 80%, rgba(0, 212, 170, 0.1), transparent 50%),
+                #05050a;
+            overflow: hidden;
+        }
+
+        .auth-shell__visual canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Hide the Spline watermark badge, wherever it gets injected */
+        .auth-shell__visual a[href*="spline.design"] {
+            display: none !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        .auth-shell__visual-badge {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            z-index: 2;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: rgba(10, 10, 15, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 11px;
+            letter-spacing: 0.01em;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .auth-shell__visual-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00d4aa;
+            box-shadow: 0 0 8px #00d4aa;
+        }
+
+        .setup-card {
+            flex: 1 1 60%;
+            width: 100%;
+            max-width: 560px;
             padding: var(--space-10);
             animation: fadeInScale 0.5s ease;
         }
 
         .setup-card__header {
-            text-align: center;
-            margin-bottom: var(--space-8);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+            text-align: left;
+        }
+
+        .setup-card__brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .setup-card__brand-name {
+            font-family: var(--font-heading);
+            font-weight: var(--weight-bold);
+            font-size: var(--text-base);
+            line-height: 1.2;
+        }
+
+        .setup-card__brand-tag {
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .setup-card__pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+            font-size: 11px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .setup-card__pill .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #00d4aa;
+            box-shadow: 0 0 6px #00d4aa;
         }
 
         .setup-card__logo {
-            width: 56px;
-            height: 56px;
-            margin: 0 auto var(--space-5);
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
             background: var(--gradient-primary);
             border-radius: var(--radius-lg);
             display: flex;
@@ -200,8 +313,15 @@
 
         .shake { animation: shake 0.4s ease; }
 
+        @media (max-width: 960px) {
+            .auth-shell__visual { display: none; }
+            .auth-shell { max-width: 560px; }
+            .setup-card { max-width: none; }
+        }
+
         @media (max-width: 480px) {
             .setup-card { padding: var(--space-6); }
+            .setup-card__header { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
             .setup-row { grid-template-columns: 1fr; }
             .setup-row--three { grid-template-columns: 1fr; }
             .setup-back { top: var(--space-4); left: var(--space-4); }
@@ -224,12 +344,21 @@
     </a>
 
     <main class="setup-page">
-        <div class="setup-card glass-card--elevated">
+        <div class="auth-shell glass-card--elevated">
+        <div class="setup-card">
             <div class="setup-card__header">
-                <div class="setup-card__logo"><svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5L4.5 5.5V11C4.5 15.8 7.6 20.2 12 21.5C16.4 20.2 19.5 15.8 19.5 11V5.5L12 2.5Z" fill="white"/><path d="M8.5 12L10.8 14.3L15.5 9.2" stroke="#6c63ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
-                <h1 class="setup-card__title">Create Your Account</h1>
-                <p class="setup-card__subtitle">Set up your class and your own login — this only needs to be done once per device.</p>
+                <div class="setup-card__brand">
+                    <div class="setup-card__logo"><svg viewBox="0 0 24 24" width="60%" height="60%" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5L4.5 5.5V11C4.5 15.8 7.6 20.2 12 21.5C16.4 20.2 19.5 15.8 19.5 11V5.5L12 2.5Z" fill="white"/><path d="M8.5 12L10.8 14.3L15.5 9.2" stroke="#6c63ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
+                    <div>
+                        <div class="setup-card__brand-name">Anti-Kuddus Protocol</div>
+                        <div class="setup-card__brand-tag">Class Operating System</div>
+                    </div>
+                </div>
+                <div class="setup-card__pill"><span class="dot"></span> One-Time Setup</div>
             </div>
+
+            <h1 class="setup-card__title">Create Your Account</h1>
+            <p class="setup-card__subtitle" style="margin-bottom: var(--space-8);">Set up your class and your own login — this only needs to be done once per device.</p>
 
             <form class="setup-form" id="setup-form" novalidate>
                 <div class="form-group">
@@ -388,12 +517,29 @@
                 <p>Already have an account? <a href="login.html" style="color: var(--accent-primary); font-weight: var(--weight-medium); text-decoration: none;">Sign in</a></p>
             </div>
         </div>
+
+        <div class="auth-shell__visual" aria-hidden="true">
+            <canvas id="canvas3d"></canvas>
+            <div class="auth-shell__visual-badge"><span class="dot"></span> Interactive Workspace Ecosystem</div>
+        </div>
+        </div>
     </main>
 
     <script src="js/storage.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/app.js"></script>
+    <script type="module">
+        import { Application } from 'https://cdn.jsdelivr.net/npm/@splinetool/runtime/+esm';
+
+        const canvas = document.getElementById('canvas3d');
+        if (canvas) {
+            const app = new Application(canvas);
+            app.load('https://prod.spline.design/N1COK7UWps1EnDa0/scene.splinecode').catch(function () {
+                canvas.closest('.auth-shell__visual').style.display = 'none';
+            });
+        }
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var roleCaptain = document.getElementById('role-captain');
