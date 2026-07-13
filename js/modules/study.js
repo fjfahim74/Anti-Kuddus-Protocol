@@ -11,6 +11,10 @@ const StudyModule = (function () {
         var generateBtn = document.getElementById('generate-summary-btn');
         var clearBtn = document.getElementById('clear-input-btn');
         var copyBtn = document.getElementById('copy-output-btn');
+        var textarea = document.getElementById('syllabus-input');
+        var charCount = document.getElementById('study-char-count');
+        var typeSelect = document.getElementById('summary-type');
+        var typeChips = document.querySelectorAll('.summary-type-chip');
 
         if (generateBtn) {
             generateBtn.addEventListener('click', handleGenerate);
@@ -18,8 +22,9 @@ const StudyModule = (function () {
 
         if (clearBtn) {
             clearBtn.addEventListener('click', function () {
-                document.getElementById('syllabus-input').value = '';
-                document.getElementById('syllabus-input').focus();
+                textarea.value = '';
+                textarea.focus();
+                updateCharCount();
             });
         }
 
@@ -32,6 +37,30 @@ const StudyModule = (function () {
                 });
             });
         }
+
+        function updateCharCount() {
+            if (!textarea || !charCount) return;
+            var len = textarea.value.length;
+            charCount.textContent = len + (len === 1 ? ' character' : ' characters');
+            charCount.classList.toggle('study-char-count--ok', len >= 20);
+        }
+
+        if (textarea) {
+            textarea.addEventListener('input', updateCharCount);
+            updateCharCount();
+        }
+
+        typeChips.forEach(function (chip) {
+            chip.addEventListener('click', function () {
+                typeChips.forEach(function (c) {
+                    c.classList.remove('is-active');
+                    c.setAttribute('aria-checked', 'false');
+                });
+                chip.classList.add('is-active');
+                chip.setAttribute('aria-checked', 'true');
+                if (typeSelect) typeSelect.value = chip.dataset.type;
+            });
+        });
     }
 
     function initHistory() {

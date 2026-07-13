@@ -42,8 +42,14 @@
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </a>
                 <div class="page-header__info">
-                    <h1 class="page-header__title">AI Study Assistant</h1>
-                    <p class="page-header__subtitle">Get AI-powered syllabus summaries with Google Gemini</p>
+                    <h1 class="page-header__title">
+                        AI Study Assistant
+                        <span class="badge badge--primary study-live-badge">
+                            <span class="study-live-dot" aria-hidden="true"></span>
+                            Live
+                        </span>
+                    </h1>
+                    <p class="page-header__subtitle">Paste any syllabus or chapter text and get an instant, structured summary powered by Gemini.</p>
                 </div>
             </div>
 
@@ -53,43 +59,77 @@
                 <div class="study-input-panel">
                     <div class="glass-card study-input-card">
                         <div class="study-input-card__header">
-                            <h3>Paste Your Syllabus</h3>
+                            <h3>
+                                <span class="study-step-num">1</span>
+                                Paste Your Syllabus
+                            </h3>
                             <button class="btn btn--ghost btn--sm" id="clear-input-btn" aria-label="Clear input">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                                 Clear
                             </button>
                         </div>
 
-                        <textarea id="syllabus-input" class="form-input study-textarea" rows="10" placeholder="Paste your syllabus content, chapter text, or study material here...
+                        <div class="study-textarea-wrap">
+                            <textarea id="syllabus-input" class="form-input study-textarea" rows="10" placeholder="Paste your syllabus content, chapter text, or study material here...
 
 Example:
 Chapter 5: Photosynthesis
 Photosynthesis is the process by which green plants use sunlight to synthesize food from carbon dioxide and water..."></textarea>
+                            <div class="study-char-count" id="study-char-count">0 characters</div>
+                        </div>
 
                         <div class="study-options">
                             <div class="form-group">
-                                <label class="form-label" for="summary-type">Summary Type</label>
-                                <select id="summary-type" class="form-input">
-                                    <option value="bullet">Bullet Points</option>
+                                <label class="form-label" id="summary-type-label">Summary Type</label>
+                                <select id="summary-type" class="hidden" aria-hidden="true" tabindex="-1">
+                                    <option value="bullet" selected>Bullet Points</option>
                                     <option value="brief">Brief Summary</option>
                                     <option value="detailed">Detailed Notes</option>
-                                    <option value="qa">Q&A Format</option>
+                                    <option value="qa">Q&amp;A Format</option>
                                     <option value="explain">Explain Like I'm 12</option>
                                 </select>
+                                <div class="summary-type-group" id="summary-type-group" role="radiogroup" aria-labelledby="summary-type-label">
+                                    <button type="button" class="summary-type-chip is-active" data-type="bullet" role="radio" aria-checked="true">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                        Bullet Points
+                                    </button>
+                                    <button type="button" class="summary-type-chip" data-type="brief" role="radio" aria-checked="false">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+                                        Brief
+                                    </button>
+                                    <button type="button" class="summary-type-chip" data-type="detailed" role="radio" aria-checked="false">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                        Detailed
+                                    </button>
+                                    <button type="button" class="summary-type-chip" data-type="qa" role="radio" aria-checked="false">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                        Q&amp;A
+                                    </button>
+                                    <button type="button" class="summary-type-chip" data-type="explain" role="radio" aria-checked="false">
+                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.1 2.3 5.3.6.6.7 1.1.7 1.7v1a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-1c0-.6.1-1.1.7-1.7C17.8 13.1 19 11.4 19 9a7 7 0 0 0-7-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg>
+                                        Explain Simply
+                                    </button>
+                                </div>
                             </div>
 
-                            <button class="btn btn--primary btn--lg btn--full" id="generate-summary-btn">
+                            <button class="btn btn--primary btn--lg btn--full study-generate-btn" id="generate-summary-btn">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                                 Generate Summary
                             </button>
                         </div>
                     </div>
+                </div>
 
                 <!-- Output Panel -->
                 <div class="study-output-panel">
                     <div class="glass-card study-output-card">
                         <div class="study-output-card__header">
-                            <h3>AI Summary</h3>
+                            <h3>
+                                <span class="study-ai-avatar" aria-hidden="true">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.4 1.2 4.1 2.3 5.3.6.6.7 1.1.7 1.7v1a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-1c0-.6.1-1.1.7-1.7C17.8 13.1 19 11.4 19 9a7 7 0 0 0-7-7z"/></svg>
+                                </span>
+                                AI Summary
+                            </h3>
                             <div class="study-output-card__actions" id="output-actions" style="display: none;">
                                 <button class="btn btn--ghost btn--sm" id="copy-output-btn" data-tooltip="Copy to clipboard">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -100,7 +140,9 @@ Photosynthesis is the process by which green plants use sunlight to synthesize f
 
                         <div class="study-output" id="study-output">
                             <div class="study-output__empty">
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
+                                <div class="study-output__empty-icon">
+                                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
+                                </div>
                                 <p>Paste your syllabus and click <strong>Generate Summary</strong> to see AI-generated notes here.</p>
                             </div>
                         </div>
