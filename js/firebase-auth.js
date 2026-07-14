@@ -56,6 +56,9 @@ async function signUp({ rollNumber, name, role, captainLevel, password, schoolNa
         role,
         captainLevel: role === 'captain' ? captainLevel : null,
         classId: CLASS_ID,
+        schoolName,
+        className,
+        section,
         createdAt: serverTimestamp()
     };
 
@@ -99,14 +102,26 @@ async function signIn(rollNumber, password, instituteName) {
     const email = emailForRoll(rollNumber);
     const credential = await signInWithEmailAndPassword(auth, email, password);
 
-    // Institute name is checked *after* auth succeeds (reading classes/{id}
-    // requires isSignedIn() per the current Firestore rules), so a wrong
-    // institute name still needs its own explicit rejection + sign-out
-    // rather than silently letting the login through.
+    // Fetch the user's own profile first — this is now the source of truth
+    // for the institute-name check, since it's written per-user at signup
+    // and can't be clobbered by another student's shared class-doc write.
+    const profile = await getUserProfile(credential.user.uid);
+    if (!profile) {
+        await signOut(auth);
+        throw new Error('Account exists but profile data is missing. Contact your captain.');
+    }
+
     if (instituteName !== undefined) {
-        const classConfig = await getClassConfig();
         const typed = normalizeInstituteName(instituteName);
-        const stored = normalizeInstituteName(classConfig && classConfig.schoolName);
+
+        // Prefer schoolName stored directly on this user's own profile.
+        // Fall back to the shared classes/{CLASS_ID} doc only for older
+        // accounts created before schoolName was saved per-user.
+        let stored = normalizeInstituteName(profile.schoolName);
+        if (!stored) {
+            const classConfig = await getClassConfig();
+            stored = normalizeInstituteName(classConfig && classConfig.schoolName);
+        }
 
         if (!stored || typed !== stored) {
             await signOut(auth);
@@ -116,10 +131,6 @@ async function signIn(rollNumber, password, instituteName) {
         }
     }
 
-    const profile = await getUserProfile(credential.user.uid);
-    if (!profile) {
-        throw new Error('Account exists but profile data is missing. Contact your captain.');
-    }
     cacheSession(profile);
     return profile;
 }
